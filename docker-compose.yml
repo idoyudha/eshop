@@ -1,0 +1,58 @@
+networks:
+  eshop-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+
+services:
+  #######################################
+  # Redis: In Memory Database
+  #######################################
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks:
+      - eshop-net
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass password
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    volumes:
+      - redis-data:/var/lib/redis
+
+  
+  #######################################
+  # RedisInsight: Redis GUI
+  #######################################
+  redisinsight:
+    image: redislabs/redisinsight:1.13.1
+    container_name: redisinsight
+    depends_on:
+      - redis
+    networks:
+      - eshop-net
+    ports:
+      - "8001:8001"
+
+  #######################################
+  # Product service
+  #######################################
+  eshop-product:
+    build:
+      context: ./src/eshop-product
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-product
+    env_file:
+      - ./src/eshop-product/.env
+    ports:
+      - "2001:2001" # http port
+    volumes:
+      - ./src/eshop-product:/app
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - eshop-net
