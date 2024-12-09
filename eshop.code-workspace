@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "src/eshop-auth"
+		},
+		{
+			"path": "src/eshop-cart"
+		},
+		{
+			"path": "src/eshop-order"
+		},
+		{
+			"path": "src/eshop-payment"
+		},
+		{
+			"path": "src/eshop-product"
+		},
+		{
+			"path": "src/eshop-sales-report"
+		},
+		{
+			"path": "src/eshop-warehouse"
+		},
+	],
+	"settings": {}
+}
