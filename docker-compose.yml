@@ -102,3 +102,37 @@ services:
         condition: service_healthy
     networks:
       - eshop-net
+
+  #######################################
+  # Auth service
+  #######################################
+  eshop-auth:
+    build:
+      context: ./src/eshop-auth
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-auth
+    env_file:
+      - ./src/eshop-auth/.env
+    ports:
+      - "2003:2003" # http port
+    volumes:
+      - ./src/eshop-auth:/app
+    networks:
+      - eshop-net
+
+  #######################################
+  # Warehouse service
+  #######################################
+  eshop-warehouse:
+    build:
+      context: ./src/eshop-warehouse
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-warehouse
+    ports:
+      - "2005:2005" # http port
+    volumes:
+      - ./src/eshop-warehouse:/app
+    networks:
+      - eshop-net
