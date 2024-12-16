@@ -323,13 +323,13 @@ services:
       - kafka1
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka1:29092 1 30 && \
-              kafka-topics --create --topic product_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product_amount_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic payment_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic payment_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic sale_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-console-producer --bootstrap-server kafka0:29092 -topic product_created < /data/message.json'"
+              kafka-topics --create --topic product-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic payment-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
     networks:
       - eshop-net
 
