@@ -191,11 +191,11 @@ services:
       - schemaregistry0
       - schemaregistry1
     environment:
-      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_NAME: product
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9997
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085
-      KAFKA_CLUSTERS_1_NAME: secondLocal
+      KAFKA_CLUSTERS_1_NAME: sale
       KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
       KAFKA_CLUSTERS_1_METRICS_PORT: 9998
       KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
@@ -231,8 +231,8 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
     volumes:
-      - ./scripts/update_run.sh:/tmp/update_run.sh
-    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
     networks:
       - eshop-net
 
@@ -264,8 +264,8 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
     volumes:
-      - ./scripts/update_run.sh:/tmp/update_run.sh
-    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
     networks:
       - eshop-net
 
@@ -323,13 +323,13 @@ services:
       - kafka1
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka1:29092 1 30 && \
-              kafka-topics --create --topic product.created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product.updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product.amount.updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic payment.created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic payment.updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic sale.created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-console-producer --bootstrap-server kafka0:29092 -topic product.created < /data/message.json'"
+              kafka-topics --create --topic product_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product_amount_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic payment_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic payment_updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic sale_created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-console-producer --bootstrap-server kafka0:29092 -topic product_created < /data/message.json'"
     networks:
       - eshop-net
 
