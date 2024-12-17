@@ -108,6 +108,8 @@ services:
     depends_on:
       redis:
         condition: service_started
+      kafka0: 
+        condition: service_started
     networks:
       - eshop-net
 
@@ -131,6 +133,8 @@ services:
         condition: service_started
       mysql-cart:
         condition: service_healthy
+      kafka0: 
+        condition: service_started
     networks:
       - eshop-net
 
