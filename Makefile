@@ -11,6 +11,10 @@ down: ### down all services
 	docker compose down
 .PHONY: down
 
+stop: ### stop all services
+	docker compose stop
+.PHONY: down
+
 clone: ### clone repository
 	bash scripts/clone_repos.sh
 .PHONY: clone

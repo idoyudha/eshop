@@ -67,14 +67,14 @@ services:
   #######################################
   # PostgreSQL: Warehouse Database
   #######################################
-  postgesql-warehouse:
+  postgresql-warehouse:
     image: postgres:17-alpine
-    container_name: postgesql-warehouse
+    container_name: postgresql-warehouse
     restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: warehouse
+      POSTGRES_DB: warehouses
     ports:
       - "5432:5432"
     volumes:
@@ -172,8 +172,12 @@ services:
     volumes:
       - ./src/eshop-warehouse:/app
     depends_on:
-      postgesql-warehouse:
+      redis:
+        condition: service_started
+      postgresql-warehouse:
         condition: service_healthy
+      kafka0: 
+        condition: service_started
     networks:
       - eshop-net
 
