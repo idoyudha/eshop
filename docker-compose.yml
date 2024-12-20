@@ -65,6 +65,50 @@ services:
       retries: 10
 
   #######################################
+  # PostgreSQL: Order Write Database
+  #######################################
+  postgresql-order-write:
+    image: postgres:17-alpine
+    container_name: postgresql-order-write
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_write
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-order-write-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+
+  #######################################
+  # PostgreSQL: Order Read Database
+  #######################################
+  postgresql-order-read:
+    image: postgres:17-alpine
+    container_name: postgresql-order-read
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_read
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-order-read-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+
+  #######################################
   # PostgreSQL: Warehouse Database
   #######################################
   postgresql-warehouse:
@@ -153,6 +197,31 @@ services:
       - "2003:2003" # http port
     volumes:
       - ./src/eshop-auth:/app
+    networks:
+      - eshop-net
+  
+  ####################################### 
+  # Order service
+  #######################################
+  eshop-order:
+    build:
+      context: ./src/eshop-order
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-order
+    env_file:
+      - ./src/eshop-order/.env
+    ports:
+      - "2004:2004" # http port
+    volumes:
+      - ./src/eshop-order:/app
+    depends_on:
+      postgresql-order-write:
+        condition: service_healthy
+      postgresql-order-read:
+        condition: service_healthy
+      kafka0: 
+        condition: service_started
     networks:
       - eshop-net
 
