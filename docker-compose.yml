@@ -6,6 +6,8 @@ volumes:
   redis-data:
   mysql-cart-data:
   postgres-warehouse-data:
+  postgres-order-write-data:
+  postgres-order-read-data:
 
 services:
   #######################################
