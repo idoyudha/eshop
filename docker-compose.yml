@@ -406,7 +406,6 @@ services:
               kafka-topics --create --topic product-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
               kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
               kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic payment-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
