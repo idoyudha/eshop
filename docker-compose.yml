@@ -5,6 +5,7 @@ networks:
 volumes:
   redis-data:
   mysql-cart-data:
+  mysql-payment-data:  
   postgres-warehouse-data:
   postgres-order-write-data:
   postgres-order-read-data:
@@ -131,6 +132,29 @@ services:
       test: ["CMD", "pg_isready", "-U", "admin"]
       timeout: 20s
       retries: 10
+
+  #######################################
+  # MySQL: Payment Database
+  #######################################
+  mysql-payment:
+    image: mysql:9
+    container_name: mysql-payment
+    restart: always
+    environment:
+      MYSQL_USER: admin
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: payments
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-payment-data:/var/lib/mysql
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 20s
+      retries: 10
   
   #######################################
   # Database ############################
@@ -248,6 +272,30 @@ services:
       postgresql-warehouse:
         condition: service_healthy
       kafka0: 
+        condition: service_started
+    networks:
+      - eshop-net
+  
+  #######################################
+  # Payment service
+  #######################################
+  eshop-payment:
+    build:
+      context: ./src/eshop-payment
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-payment
+    env_file:
+      - ./src/eshop-payment/.env
+    ports:
+      - "2006:2006" # http port
+      - "5005:5005" # debug port
+    volumes:
+      - ./src/eshop-payment:/app
+    depends_on:
+      mysql-payment:
+        condition: service_healthy
+      kafka1: 
         condition: service_started
     networks:
       - eshop-net
