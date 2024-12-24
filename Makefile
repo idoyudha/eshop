@@ -15,6 +15,10 @@ stop: ### stop all services
 	docker compose stop
 .PHONY: down
 
+restart: ### restart all services
+	docker compose restart
+.PHONY: down
+
 clone: ### clone repository
 	bash scripts/clone_repos.sh
 
