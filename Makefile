@@ -17,4 +17,10 @@ stop: ### stop all services
 
 clone: ### clone repository
 	bash scripts/clone_repos.sh
+
+build: ### build service
+	@bash scripts/build.sh $(filter-out $@,$(MAKECMDGOALS))
+
+logs: ### show logs
+	@bash scripts/logs.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: clone
