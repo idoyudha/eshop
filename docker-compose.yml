@@ -279,26 +279,26 @@ services:
   #######################################
   # Payment service
   #######################################
-  # eshop-payment:
-  #   build:
-  #     context: ./src/eshop-payment
-  #     dockerfile: Dockerfile.dev
-  #     target: dev
-  #   container_name: eshop-payment
-  #   env_file:
-  #     - ./src/eshop-payment/.env
-  #   ports:
-  #     - "2006:2006" # http port
-  #     - "5005:5005" # debug port
-  #   volumes:
-  #     - ./src/eshop-payment:/app
-  #   depends_on:
-  #     mysql-payment:
-  #       condition: service_healthy
-  #     kafka1: 
-  #       condition: service_started
-  #   networks:
-  #     - eshop-net
+  eshop-payment:
+    build:
+      context: ./src/eshop-payment
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-payment
+    env_file:
+      - ./src/eshop-payment/.env
+    ports:
+      - "2006:2006" # http port
+      - "5005:5005" # debug port
+    volumes:
+      - ./src/eshop-payment:/app
+    depends_on:
+      mysql-payment:
+        condition: service_healthy
+      kafka1: 
+        condition: service_started
+    networks:
+      - eshop-net
 
   #######################################
   # Kafka ###############################
