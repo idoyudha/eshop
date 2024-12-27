@@ -27,6 +27,9 @@
 		{
 			"path": "src/eshop-fe-customer"
 		},
+		{
+			"path": "src/eshop-fe-admin"
+		},
 	],
 	"settings": {}
 }
