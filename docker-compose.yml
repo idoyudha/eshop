@@ -334,6 +334,39 @@ services:
       - eshop-net
 
   #######################################
+  # FE Admin service
+  #######################################
+  eshop-fe-admin:
+    build:
+      context: ./src/eshop-fe-admin
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-fe-admin
+    env_file:
+      - ./src/eshop-fe-admin/.env.local
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./src/eshop-fe-admin:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      eshop-product: 
+        condition: service_started
+      eshop-cart: 
+        condition: service_started
+      eshop-order: 
+        condition: service_started
+      eshop-payment: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
   # Kafka ###############################
   #######################################
   
