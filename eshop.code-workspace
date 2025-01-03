@@ -30,6 +30,9 @@
 		{
 			"path": "src/eshop-fe-admin"
 		},
+		{
+			"path": "src/eshop-shipping-cost"
+		}
 	],
 	"settings": {}
 }
