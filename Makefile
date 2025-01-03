@@ -27,4 +27,10 @@ build: ### build service
 
 logs: ### show logs
 	@bash scripts/logs.sh $(filter-out $@,$(MAKECMDGOALS))
+
+topic0: ### show list of topic kafka0
+	docker exec kafka0 kafka-topics --list --bootstrap-server localhost:9092
+
+topic1: ### show list of topic kafka1
+	docker exec kafka1 kafka-topics --list --bootstrap-server localhost:9092
 .PHONY: clone

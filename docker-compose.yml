@@ -246,8 +246,8 @@ services:
         condition: service_healthy
       postgresql-order-read:
         condition: service_healthy
-      kafka0: 
-        condition: service_started
+      kafka1: 
+        condition: service_healthy
     networks:
       - eshop-net
 
@@ -334,6 +334,39 @@ services:
       - eshop-net
 
   #######################################
+  # FE Admin service
+  #######################################
+  eshop-fe-admin:
+    build:
+      context: ./src/eshop-fe-admin
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: eshop-fe-admin
+    env_file:
+      - ./src/eshop-fe-admin/.env.local
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./src/eshop-fe-admin:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      eshop-product: 
+        condition: service_started
+      eshop-cart: 
+        condition: service_started
+      eshop-order: 
+        condition: service_started
+      eshop-payment: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
   # Kafka ###############################
   #######################################
   
@@ -393,6 +426,12 @@ services:
     volumes:
       - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - eshop-net
 
@@ -426,6 +465,12 @@ services:
     volumes:
       - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - eshop-net
 
