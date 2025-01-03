@@ -1,5 +1,15 @@
-# eshop
-The application is a web-based e-commerce app where users can browse products, add them to the cart, and purchase them.
+**Eshop** is a cloud microservices application. The application is a web-based e-commerce app where users can find cars or motorcycle, add them to the cart, and purchase them.
+
+This application combining the service from Amazon Web Service and Google Cloud Platform.
+
+## Architecture
+![](./docs/img/architecture.png)
+
+| Service           | Language   | Description                                                                                            |
+|-------------------|------------|--------------------------------------------------------------------------------------------------------|
+| Frontend Customer | Typescript | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product. |
+| Frontend Admin    | Typescript | Expose an HTTP server to serve the website for admin. Require signup/login to perform all actions.     |
+| User Auth         | Go | Perform centralize authorization for all internal service.                                             |
 
 ## User management
 - handled by amazon cognito
