@@ -92,7 +92,7 @@ spec:
                 configMapKeyRef:
                   key: PRODUCT_SERVICE
                   name: eshop-fe-customer-env-local
-          image: eshop-fe-customer
+          image: gcr.io/eshop-444706/eshop-fe-customer:v1
           name: eshop-fe-customer
           ports:
             - containerPort: 3000

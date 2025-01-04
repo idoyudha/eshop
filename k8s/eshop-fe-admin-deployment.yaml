@@ -102,7 +102,7 @@ spec:
                 configMapKeyRef:
                   key: WAREHOUSE_SERVICE
                   name: eshop-fe-admin-env-local
-          image: eshop-fe-admin
+          image: gcr.io/eshop-444706/eshop-fe-admin:v1
           name: eshop-fe-admin
           ports:
             - containerPort: 3001

@@ -30,7 +30,7 @@ spec:
               value: password
             - name: POSTGRES_USER
               value: admin
-          image: postgres:17-alpine
+          image: gcr.io/eshop-444706/postgresql-order-read:v1
           livenessProbe:
             exec:
               command:

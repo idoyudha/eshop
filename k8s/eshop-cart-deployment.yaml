@@ -69,7 +69,7 @@ spec:
                 configMapKeyRef:
                   key: REDIS_URL
                   name: eshop-cart-env
-          image: eshop-cart
+          image: gcr.io/eshop-444706/eshop-cart:v1
           name: eshop-cart
           ports:
             - containerPort: 2002

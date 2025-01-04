@@ -34,7 +34,7 @@ spec:
                 configMapKeyRef:
                   key: AWS_COGNITO_REGION
                   name: eshop-auth-env
-          image: eshop-auth
+          image: gcr.io/eshop-444706/eshop-auth:v1
           name: eshop-auth
           ports:
             - containerPort: 2003

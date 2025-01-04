@@ -84,7 +84,7 @@ spec:
                 configMapKeyRef:
                   key: S3_BUCKET_NAME
                   name: eshop-payment-env
-          image: eshop-payment
+          image: gcr.io/eshop-444706/eshop-payment:v1
           name: eshop-payment
           ports:
             - containerPort: 2006

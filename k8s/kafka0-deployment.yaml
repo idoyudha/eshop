@@ -60,7 +60,7 @@ spec:
               value: "1"
             - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
               value: "1"
-          image: confluentinc/cp-kafka:7.2.1
+          image: gcr.io/eshop-444706/kafka0:v1
           livenessProbe:
             exec:
               command:

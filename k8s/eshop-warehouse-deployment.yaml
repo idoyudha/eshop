@@ -64,7 +64,7 @@ spec:
                 configMapKeyRef:
                   key: REDIS_URL
                   name: eshop-warehouse-env
-          image: eshop-warehouse
+          image: gcr.io/eshop-444706/eshop-warehouse:v1
           name: eshop-warehouse
           ports:
             - containerPort: 2005

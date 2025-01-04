@@ -37,7 +37,7 @@ services:
   mysql-cart:
     image: mysql:9
     container_name: mysql-cart
-    restart: unless-stopped
+    restart: always
     environment:
       MYSQL_USER: admin
       MYSQL_ROOT_PASSWORD: password
@@ -156,7 +156,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-product
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-product/.env
     ports:
@@ -180,7 +180,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-cart
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-cart/.env
     ports:
@@ -206,7 +206,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-auth
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-auth/.env
     ports:
@@ -225,7 +225,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-order
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-order/.env
     ports:
@@ -251,7 +251,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-warehouse
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-warehouse/.env
     ports:
@@ -277,7 +277,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: eshop-payment
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-payment/.env
     ports:
@@ -305,7 +305,7 @@ services:
         NEXT_TELEMETRY_DISABLED: "1"
         NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-customer
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-fe-customer/.env.local
     ports:
@@ -335,7 +335,7 @@ services:
         NEXT_TELEMETRY_DISABLED: "1"
         NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-admin
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./src/eshop-fe-admin/.env.local
     ports:
@@ -362,7 +362,7 @@ services:
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:v0.7.2
-    restart: unless-stopped
+    restart: always
     ports:
       - 8080:8080
     depends_on:
@@ -389,7 +389,7 @@ services:
     image: confluentinc/cp-kafka:7.2.1
     hostname: kafka0
     container_name: kafka0
-    restart: unless-stopped
+    restart: always
     ports:
       - "9092:9092"
       - "9997:9997"
@@ -429,7 +429,7 @@ services:
     image: confluentinc/cp-kafka:7.2.1
     hostname: kafka1
     container_name: kafka1
-    restart: unless-stopped
+    restart: always
     ports:
       - "9093:9092"
       - "9998:9998"

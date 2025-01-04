@@ -89,7 +89,7 @@ spec:
                 configMapKeyRef:
                   key: WAREHOUSE_SERVICE
                   name: eshop-order-env
-          image: eshop-order
+          image: gcr.io/eshop-444706/eshop-order:v1
           name: eshop-order
           ports:
             - containerPort: 2004

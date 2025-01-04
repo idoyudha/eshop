@@ -38,8 +38,9 @@ topic1: ### show list of topic kafka1
 build-prod: ### build all services for production
 	docker compose -f docker-compose.prod.yml build
 
-kompose: ### convert docker-compose.prod.yml to kubernetes yaml
-	kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+kompose: ### convert docker-compose.prod.yml to kubernetes yaml and update the images
+	@kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+	@bash scripts/update_k8s_manifests.sh eshop-444706
 .PHONY: kompose
 
 tag: ### tag docker images with GCR prefix
@@ -54,3 +55,19 @@ tag-push: ### tag and push docker images to GCR
 	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
 	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: tag-push
+
+deploy: ### deploy all services to kubernetes
+	@bash scripts/deploy.sh
+.PHONY: deploy
+
+k8s-status: ### Check Kubernetes deployment status
+	kubectl get pods,svc,configmap -n eshop
+.PHONY: k8s-status
+
+k8s-logs: ### Get logs for a specific pod
+	@kubectl logs -f -n eshop $(filter-out $@,$(MAKECMDGOALS))
+.PHONY: k8s-logs
+
+k8s-delete: ### Delete all resources from namespace
+	kubectl delete -f k8s/ -n eshop
+.PHONY: k8s-delete
