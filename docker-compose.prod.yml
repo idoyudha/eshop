@@ -1,0 +1,525 @@
+networks:
+  eshop-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+  mysql-cart-data:
+  mysql-payment-data:  
+  postgres-warehouse-data:
+  postgres-order-write-data:
+  postgres-order-read-data:
+
+services:
+  #######################################
+  # Database ############################
+  #######################################
+
+  #######################################
+  # Redis: In Memory Database (Category and Cart)
+  #######################################
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks:
+      - eshop-net
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass password
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    volumes:
+      - redis-data:/var/lib/redis
+  
+  #######################################
+  # MySQL: Cart Database
+  #######################################
+  mysql-cart:
+    image: mysql:9
+    container_name: mysql-cart
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: admin
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: carts
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-cart-data:/var/lib/mysql
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 20s
+      retries: 10
+  
+  #######################################
+  # PostgreSQL: Order Write Database
+  #######################################
+  postgresql-order-write:
+    image: postgres:17-alpine
+    container_name: postgresql-order-write
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_write
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-order-write-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+
+  #######################################
+  # PostgreSQL: Order Read Database
+  #######################################
+  postgresql-order-read:
+    image: postgres:17-alpine
+    container_name: postgresql-order-read
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: orders_read
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-order-read-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+
+  #######################################
+  # PostgreSQL: Warehouse Database
+  #######################################
+  postgresql-warehouse:
+    image: postgres:17-alpine
+    container_name: postgresql-warehouse
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: warehouses
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-warehouse-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+
+  #######################################
+  # MySQL: Payment Database
+  #######################################
+  mysql-payment:
+    image: mysql:9
+    container_name: mysql-payment
+    restart: always
+    environment:
+      MYSQL_USER: admin
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: payments
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-payment-data:/var/lib/mysql
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 20s
+      retries: 10
+  
+  #######################################
+  # Database ############################
+  #######################################
+
+  #######################################
+  # Product service
+  #######################################
+  eshop-product:
+    build:
+      context: ./src/eshop-product
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-product
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-product/.env
+    ports:
+      - "2001:2001" # http port
+    volumes:
+      - ./src/eshop-product:/app
+    depends_on:
+      redis:
+        condition: service_started
+      kafka0: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  ####################################### 
+  # Cart service
+  #######################################
+  eshop-cart:
+    build:
+      context: ./src/eshop-cart
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-cart
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-cart/.env
+    ports:
+      - "2002:2002" # http port
+    volumes:
+      - ./src/eshop-cart:/app
+    depends_on:
+      redis:
+        condition: service_started
+      mysql-cart:
+        condition: service_healthy
+      kafka0: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
+  # Auth service
+  #######################################
+  eshop-auth:
+    build:
+      context: ./src/eshop-auth
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-auth
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-auth/.env
+    ports:
+      - "2003:2003" # http port
+    volumes:
+      - ./src/eshop-auth:/app
+    networks:
+      - eshop-net
+
+  ####################################### 
+  # Order service
+  #######################################
+  eshop-order:
+    build:
+      context: ./src/eshop-order
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-order
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-order/.env
+    ports:
+      - "2004:2004" # http port
+    volumes:
+      - ./src/eshop-order:/app
+    depends_on:
+      postgresql-order-write:
+        condition: service_healthy
+      postgresql-order-read:
+        condition: service_healthy
+      kafka1: 
+        condition: service_healthy
+    networks:
+      - eshop-net
+
+  #######################################
+  # Warehouse service
+  #######################################
+  eshop-warehouse:
+    build:
+      context: ./src/eshop-warehouse
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-warehouse
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-warehouse/.env
+    ports:
+      - "2005:2005" # http port
+    volumes:
+      - ./src/eshop-warehouse:/app
+    depends_on:
+      redis:
+        condition: service_started
+      postgresql-warehouse:
+        condition: service_healthy
+      kafka0: 
+        condition: service_started
+    networks:
+      - eshop-net
+  
+  #######################################
+  # Payment service
+  #######################################
+  eshop-payment:
+    build:
+      context: ./src/eshop-payment
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-payment
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-payment/.env
+    ports:
+      - "2006:2006" # http port
+    volumes:
+      - ./src/eshop-payment:/app
+    depends_on:
+      mysql-payment:
+        condition: service_healthy
+      kafka1: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
+  # FE Customer service
+  #######################################
+  eshop-fe-customer:
+    build:
+      context: ./src/eshop-fe-customer
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-fe-customer
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-fe-customer/.env.local
+    ports:
+      - "3000:3000"
+    depends_on:
+      eshop-product: 
+        condition: service_started
+      eshop-cart: 
+        condition: service_started
+      eshop-order: 
+        condition: service_started
+      eshop-payment: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
+  # FE Admin service
+  #######################################
+  eshop-fe-admin:
+    build:
+      context: ./src/eshop-fe-admin
+      dockerfile: Dockerfile
+      target: production
+    container_name: eshop-fe-admin
+    restart: unless-stopped
+    env_file:
+      - ./src/eshop-fe-admin/.env.local
+    ports:
+      - "3001:3001"
+    depends_on:
+      eshop-product: 
+        condition: service_started
+      eshop-cart: 
+        condition: service_started
+      eshop-order: 
+        condition: service_started
+      eshop-payment: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka ###############################
+  #######################################
+  
+  #######################################
+  # Kafka UI
+  #######################################
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:v0.7.2
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - kafka0
+      - kafka1
+      - schemaregistry0
+      - schemaregistry1
+    environment:
+      KAFKA_CLUSTERS_0_NAME: product
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
+      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085
+      KAFKA_CLUSTERS_1_NAME: sale
+      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
+      KAFKA_CLUSTERS_1_METRICS_PORT: 9998
+      KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Broker 0
+  #######################################
+  kafka0:
+    image: confluentinc/cp-kafka:7.2.1
+    hostname: kafka0
+    container_name: kafka0
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9997:9997"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka0:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9997
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka0:29092,CONTROLLER://kafka0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    volumes:
+      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Broker 1
+  #######################################
+  kafka1:
+    image: confluentinc/cp-kafka:7.2.1
+    hostname: kafka1
+    container_name: kafka1
+    restart: unless-stopped
+    ports:
+      - "9093:9092"
+      - "9998:9998"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9998
+      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9998
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka1:29092,CONTROLLER://kafka1:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    volumes:
+      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Schema Registry 0
+  #######################################
+  schemaregistry0:
+    image: confluentinc/cp-schema-registry:7.2.1
+    ports:
+      - 8085:8085
+    depends_on:
+      - kafka0
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka0:29092
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry0
+      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry0:8085
+
+      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Schema Registry 1
+  #######################################
+  schemaregistry1:
+    image: confluentinc/cp-schema-registry:7.2.1
+    ports:
+      - 18085:8085
+    depends_on:
+      - kafka1
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka1:29092
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry1
+      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry1:8085
+
+      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Init Topics
+  #######################################
+  kafka-init-topics:
+    image: confluentinc/cp-kafka:7.2.1
+    volumes:
+      - ./data/message.json:/data/message.json
+    depends_on:
+      - kafka0
+      - kafka1
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+              cub kafka-ready -b kafka1:29092 1 30 && \
+              kafka-topics --create --topic product-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && \
+              kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && \
+              kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka ###############################
+  #######################################
