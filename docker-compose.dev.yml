@@ -310,7 +310,7 @@ services:
       target: dev
     container_name: eshop-fe-customer
     env_file:
-      - ./src/eshop-fe-customer/.env.local
+      - ./src/eshop-fe-customer/.env
     ports:
       - "3000:3000"
     volumes:
@@ -343,7 +343,7 @@ services:
       target: dev
     container_name: eshop-fe-admin
     env_file:
-      - ./src/eshop-fe-admin/.env.local
+      - ./src/eshop-fe-admin/.env
     ports:
       - "3001:3001"
     volumes:

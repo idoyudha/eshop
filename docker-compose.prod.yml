@@ -300,6 +300,10 @@ services:
       context: ./src/eshop-fe-customer
       dockerfile: Dockerfile
       target: production
+      args:
+        NEXT_BUILD_STANDALONE: "true"
+        NEXT_TELEMETRY_DISABLED: "1"
+        NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-customer
     restart: unless-stopped
     env_file:
@@ -326,6 +330,10 @@ services:
       context: ./src/eshop-fe-admin
       dockerfile: Dockerfile
       target: production
+      args:
+        NEXT_BUILD_STANDALONE: "true"
+        NEXT_TELEMETRY_DISABLED: "1"
+        NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-admin
     restart: unless-stopped
     env_file:

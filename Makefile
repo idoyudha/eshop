@@ -13,14 +13,15 @@ down: ### down all services
 
 stop: ### stop all services
 	docker compose stop
-.PHONY: down
+.PHONY: stop
 
 restart: ### restart all services
 	docker compose restart
-.PHONY: down
+.PHONY: restart
 
 clone: ### clone repository
 	bash scripts/clone_repos.sh
+.PHONY: clone
 
 build: ### build service
 	@bash scripts/build.sh $(filter-out $@,$(MAKECMDGOALS))
@@ -33,4 +34,23 @@ topic0: ### show list of topic kafka0
 
 topic1: ### show list of topic kafka1
 	docker exec kafka1 kafka-topics --list --bootstrap-server localhost:9092
-.PHONY: clone
+
+build-prod: ### build all services for production
+	docker compose -f docker-compose.prod.yml build
+
+kompose: ### convert docker-compose.prod.yml to kubernetes yaml
+	kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+.PHONY: kompose
+
+tag: ### tag docker images with GCR prefix
+	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
+.PHONY: tag
+
+push: ### push docker images to GCR
+	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
+.PHONY: push
+
+tag-push: ### tag and push docker images to GCR
+	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
+	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
+.PHONY: tag-push
