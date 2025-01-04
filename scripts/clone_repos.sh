@@ -10,6 +10,8 @@ REPOS=(
     "git@github.com:idoyudha/eshop-sales-report.git"
     "git@github.com:idoyudha/eshop-auth.git"
     "git@github.com:idoyudha/eshop-fe-customer.git"
+    "git@github.com:idoyudha/eshop-fe-admin.git"
+    "git@github.com:idoyudha/eshop-shipping-cost.git"
 )
 
 # Navigate to the script's parent directory (root/src)
