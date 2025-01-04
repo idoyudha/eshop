@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  AUTH_SERVICE: http://eshop-auth:2003
+  KAFKA_BROKER: kafka0:29092,kafka1:29092
+  MYSQL_CONN_MAX_LIFETIME: "2"
+  MYSQL_MAX_IDLE_CONNECTION: "10"
+  MYSQL_MAX_OPEN_CONNECTION: "4"
+  MYSQL_URL: admin:password@tcp(mysql-cart:3306)/carts?parseTime=true
+  ORDER_SERVICE: http://eshop-order:2004
+  REDIS_PASSWORD: password
+  REDIS_URL: redis:6379
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: eshop-cart-eshop-cart-env
+  name: eshop-cart-env

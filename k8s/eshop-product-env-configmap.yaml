@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  AUTH_SERVICE: http://eshop-auth:2003
+  AWS_ACCESS_KEY: AKIAU7FBPIAHNCRPY75D
+  AWS_CDN_DOMAIN: https://dpn2fs8em7hu0.cloudfront.net
+  AWS_DYNAMO_DB_SERVICE_ENDPOINT: dynamodb.ap-southeast-1.amazonaws.com
+  AWS_PRODUCT_BUCKET: ido-eshop-products
+  AWS_REGION: ap-southeast-1
+  AWS_SECRET_KEY: Gu5rnTAoF/6TlyWmIPm6SIai61pE0im/1/S7UBFF
+  KAFKA_BROKER: kafka0:29092
+  REDIS_PASSWORD: password
+  REDIS_URL: redis:6379
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: eshop-product-eshop-product-env
+  name: eshop-product-env

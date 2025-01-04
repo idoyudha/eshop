@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  CART_SERVICE: http://eshop-cart:2002
+  NEXT_PUBLIC_CART_SERVICE: http://localhost:2002
+  NEXT_PUBLIC_COGNITO_CLIENT_ID: 4csb1hd1acvo572aruhs7sgl7h
+  NEXT_PUBLIC_COGNITO_DOMAIN: ap-southeast-1twgawkum9.auth.ap-southeast-1.amazoncognito.com
+  NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_IN: http://localhost:3000
+  NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_OUT: http://localhost:3000
+  NEXT_PUBLIC_COGNITO_USER_POOL_ID: ap-southeast-1_TwGAwkUM9
+  NEXT_PUBLIC_IMAGE_CLOUDFRONT: dpn2fs8em7hu0.cloudfront.net
+  NEXT_PUBLIC_ORDER_SERVICE: http://localhost:2004
+  NEXT_PUBLIC_PAYMENT_SERVICE: http://localhost:2006
+  NEXT_PUBLIC_PRODUCT_SERVICE: http://localhost:2001
+  ORDER_SERVICE: http://eshop-order:2004
+  PAYMENT_SERVICE: http://eshop-payment:2006
+  PRODUCT_SERVICE: http://eshop-product:2001
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: eshop-fe-customer-eshop-fe-customer-env-local
+  name: eshop-fe-customer-env-local
