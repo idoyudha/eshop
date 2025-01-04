@@ -9,20 +9,33 @@ fi
 
 PROJECT_ID=$1
 
-# Update deployment files to use GCR images
-for file in k8s/*deployment.yaml; do
-    echo "Updating $file..."
-    # Get the service name from the filename (e.g., eshop-auth from eshop-auth-deployment.yaml)
-    service_name=$(basename "$file" | sed 's/-deployment.yaml//')
-    
-    # Use sed to update the image reference
-    # This replaces any image: line with the GCR path
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS requires an empty string after -i
-        sed -i '' "s|image: .*|image: gcr.io/${PROJECT_ID}/${service_name}:v1|" "$file"
+# List of services to update
+services=(
+    "eshop-auth"
+    "eshop-cart"
+    "eshop-fe-admin"
+    "eshop-fe-customer"
+    "eshop-order"
+    "eshop-payment"
+    "eshop-product"
+    "eshop-warehouse"
+)
+
+# Update only specific deployment files
+for service in "${services[@]}"; do
+    file="k8s/${service}-deployment.yaml"
+    if [ -f "$file" ]; then
+        echo "Updating $file..."
+        # Use sed to update the image reference with double eshop- prefix
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS requires an empty string after -i
+            sed -i '' "s|image: .*|image: gcr.io/${PROJECT_ID}/eshop-${service}:latest|" "$file"
+        else
+            # Linux version
+            sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/eshop-${service}:latest|" "$file"
+        fi
     else
-        # Linux version
-        sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/${service_name}:v1|" "$file"
+        echo "Warning: $file not found"
     fi
 done
 

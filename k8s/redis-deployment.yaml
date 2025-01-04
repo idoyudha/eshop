@@ -27,7 +27,7 @@ spec:
             - redis-server
             - --requirepass
             - password
-          image: gcr.io/eshop-444706/redis:v1
+          image: redis:7-alpine
           livenessProbe:
             exec:
               command:

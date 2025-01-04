@@ -6,6 +6,13 @@ if ! kubectl get namespace eshop &> /dev/null; then
     kubectl create namespace eshop
 fi
 
+# Deploy PersistentVolumeClaims
+echo "Deploying PersistentVolumeClaims..."
+for pvc in k8s/*persistentvolumeclaim.yaml; do
+    echo "Applying $pvc"
+    kubectl apply -f "$pvc" -n eshop
+done
+
 # Deploy resources
 echo "Deploying ConfigMaps..."
 for configmap in k8s/*configmap.yaml; do
@@ -13,7 +20,7 @@ for configmap in k8s/*configmap.yaml; do
     kubectl apply -f "$configmap" -n eshop
 done
 
-# Wait a bit for ConfigMaps to be ready
+# Wait for ConfigMaps to be ready
 sleep 2
 
 echo "Deploying Services..."

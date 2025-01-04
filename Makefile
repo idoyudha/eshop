@@ -71,3 +71,11 @@ k8s-logs: ### Get logs for a specific pod
 k8s-delete: ### Delete all resources from namespace
 	kubectl delete -f k8s/ -n eshop
 .PHONY: k8s-delete
+
+auth-gcloud: ### Authorize gcloud
+	gcloud auth configure-docker
+.PHONY: auth-gcloud
+
+gcloud-token: ### Get gcloud token
+	gcloud auth print-access-token
+.PHONY: gcloud-token

@@ -74,7 +74,7 @@ spec:
                 configMapKeyRef:
                   key: REDIS_URL
                   name: eshop-product-env
-          image: gcr.io/eshop-444706/eshop-product:v1
+          image: gcr.io/eshop-444706/eshop-eshop-product:latest
           name: eshop-product
           ports:
             - containerPort: 2001
