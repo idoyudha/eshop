@@ -6,6 +6,10 @@ if ! kubectl get namespace eshop &> /dev/null; then
     kubectl create namespace eshop
 fi
 
+# Create secrets first
+echo "Creating secrets..."
+make create-secrets
+
 # Deploy PersistentVolumeClaims
 echo "Deploying PersistentVolumeClaims..."
 for pvc in k8s/*persistentvolumeclaim.yaml; do
