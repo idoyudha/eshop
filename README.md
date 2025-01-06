@@ -5,18 +5,18 @@ This application combining the service from Amazon Web Service and Google Cloud 
 ## Architecture
 ![](./docs/img/architecture.png)
 
-| Service           | Language   | Framework   | Database     | Publisher                        | Subscriber                       | Status | Description                                                                                              |
-|-------------------|------------|-------------|--------------|----------------------------------|----------------------------------|--------|----------------------------------------------------------------------------------------------------------|
-| Frontend Customer | Typescript | NextJS      | -            | -                                | -                                | Done   | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product.   |
-| Frontend Admin    | Typescript | NextJS      | -            | -                                | -                                | Done   | Expose an HTTP server to serve the website for admin. Require signup/login to perform all actions.       |
-| Auth              | Go         | Gin         | -            | -                                | -                                | Done   | Auth service to perform centralize authorization for all internal service.                               |
-| Cart              | Go         | Gin         | Redis, MySQL | -                                | product-updated                  | Done   | Cart service for user saving cart and get their current cart.                                            |
-| Order             | Go         | Gin         | PostgresSQL  | order-created, sale-created      | order-created, payment-updated   | Done   | Order service to process ordering after user add items to the cart and fill address detail.              |
-| Payment           | Java       | Spring Boot | Mysql, S3    | payment-updated                  | -                                | Done   | Payment service that will receive the payment proof from user, then admin will validate it.              |
-| Product           | Go         | Gin         | DynamoDB, S3 | product-created, product-updated | product-quantity-updated         | Done   | Product service that will show the all the list of product and the detail also with stock.               |
-| Sales Report      | Python     | FastAPI     | PostgresSQL  | -                                | sale-created                     | Done   | Reporting service                                                                                        |
-| Shipping Cost     | Python     | -           | -            | -                                | -                                | Done   | API for calculating the cost based on the zipcode differences, running with AWS Lambda                   |
-| Warehouse         | Go         | Gin         | PostgresSQL  | product-quantity-updated         | product-created, product_updated | Done   | Warehouse service handling movement between warehouse and movement to user, also get real stock of item. |
+| Service           | Language   | Framework   | Database     | Publisher                        | Subscriber                       | Description                                                                                              |
+|-------------------|------------|-------------|--------------|----------------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------|
+| Frontend Customer | Typescript | NextJS      | -            | -                                | -                                | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product.   |
+| Frontend Admin    | Typescript | NextJS      | -            | -                                | -                                | Expose an HTTP server to serve the website for admin. Require signup/login to perform all actions.       |
+| Auth              | Go         | Gin         | -            | -                                | -                                | Auth service to perform centralize authorization for all internal service.                               |
+| Cart              | Go         | Gin         | Redis, MySQL | -                                | product-updated                  | Cart service for user saving cart and get their current cart.                                            |
+| Order             | Go         | Gin         | PostgresSQL  | order-created, sale-created      | order-created, payment-updated   | Order service to process ordering after user add items to the cart and fill address detail.              |
+| Payment           | Java       | Spring Boot | Mysql, S3    | payment-updated                  | -                                | Payment service that will receive the payment proof from user, then admin will validate it.              |
+| Product           | Go         | Gin         | DynamoDB, S3 | product-created, product-updated | product-quantity-updated         | Product service that will show the all the list of product and the detail also with stock.               |
+| Sales Report      | Python     | FastAPI     | PostgresSQL  | -                                | sale-created                     | Reporting service                                                                                        |
+| Shipping Cost     | Python     | -           | -            | -                                | -                                | API for calculating the cost based on the zipcode differences, running with AWS Lambda                   |
+| Warehouse         | Go         | Gin         | PostgresSQL  | product-quantity-updated         | product-created, product_updated | Warehouse service handling movement between warehouse and movement to user, also get real stock of item. |
 
 
 ## Services
