@@ -18,6 +18,7 @@ This application combining the service from Amazon Web Service and Google Cloud 
 | Shipping Cost     | Python     | -           | -            | -                                | -                                | Done   | API for calculating the cost based on the zipcode differences, running with AWS Lambda                   |
 | Warehouse         | Go         | Gin         | PostgresSQL  | product-quantity-updated         | product-created, product_updated | Done   | Warehouse service handling movement between warehouse and movement to user, also get real stock of item. |
 
+
 ## Services
 ### Auth
 - handled by amazon cognito requested with this service
@@ -54,3 +55,6 @@ This application combining the service from Amazon Web Service and Google Cloud 
 - great for complex analytics query
 - good performance with large datasets
 - built in time-series functionality
+
+## Documentation
+- [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally.
