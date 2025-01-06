@@ -27,7 +27,6 @@ for service in "${services[@]}"; do
     if [ -f "$file" ]; then
         echo "Updating $file..."
         sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/${service}:latest|" "$file"
-        fi
     else
         echo "Warning: $file not found"
     fi
