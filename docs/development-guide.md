@@ -14,10 +14,10 @@ This doc explains how to build and run the Eshop source code locally using [make
     ```
     make clone
     ```
-   
-2. Build and up.
+2. Create `.env` from `.env.example` for every service. Contact the author for the value.
+3. Build and up.
     ```
     make up
    ```
    
-3. Open `localhost:3000` for customer page and `localhost:3001` for admin page.
+4. Open `localhost:3000` for customer page and `localhost:3001` for admin page.
