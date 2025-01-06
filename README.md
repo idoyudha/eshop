@@ -5,16 +5,17 @@ This application combining the service from Amazon Web Service and Google Cloud 
 ## Architecture
 ![](./docs/img/architecture.png)
 
-| Service| Language| Framework | Database | Status                                                                                           | Description                                                                                            |
-|-------|---------|----|-------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| Frontend Customer | Typescript | NextJS| -   | Done                                                                                             | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product. |
-| Frontend Admin | Typescript | NextJS  | -   | Done                                                                                             | Expose an HTTP server to serve the website for admin. Require signup/login to perform all actions.     |
-| Auth | Go | Gin | -           | Done                                                                                             | Auth service to terform centralize authorization for all internal service.                             |
-| Cart | Go | Gin | Redis, MySQL | Done                                                                                             | Cart service for user saving cart and get their current cart.                                          |
-| Order | Go | Gin | PostgreSQL  | Done                                                                                             | Order service to process ordering after user add items to the cart and fill address detail.            |
-| Payment | Java | Springboot  | Mysql, S3 | Done                                                                                             | Payment service that will receive the payment proof from user, then admin will validate it.            |
-| Product | Go | Gin | DynamoDB, S3 | Done |  Product service that will show the all the list of product and the detail also with stock.            |
-| Sales Report | Python | FastAPI | PostgreSQL  | Development | Reporting service                                                                                
+| Service           | Language   | Framework   | Database     | Status      | Description                                                                                            |
+|-------------------|------------|-------------|--------------|-------------|--------------------------------------------------------------------------------------------------------|
+| Frontend Customer | Typescript | NextJS      | -            | Done        | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product. |
+| Frontend Admin    | Typescript | NextJS      | -            | Done        | Expose an HTTP server to serve the website for admin. Require signup/login to perform all actions.     |
+| Auth              | Go         | Gin         | -            | Done        | Auth service to perform centralize authorization for all internal service.                             |
+| Cart              | Go         | Gin         | Redis, MySQL | Done        | Cart service for user saving cart and get their current cart.                                          |
+| Order             | Go         | Gin         | PostgresSQL  | Done        | Order service to process ordering after user add items to the cart and fill address detail.            |
+| Payment           | Java       | Spring Boot | Mysql, S3    | Done        | Payment service that will receive the payment proof from user, then admin will validate it.            |
+| Product           | Go         | Gin         | DynamoDB, S3 | Done        | Product service that will show the all the list of product and the detail also with stock.             |
+| Sales Report      | Python     | FastAPI     | PostgresSQL  | Development | Reporting service                                                                                      |
+| Shipping Cost     | Python     | -           | -            | Done        | API for calculating the cost based on the zipcode differences, running with AWS Lambda                 |
 
 ## User management
 - handled by amazon cognito
