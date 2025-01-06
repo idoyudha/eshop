@@ -58,3 +58,7 @@ This application combining the service from Amazon Web Service and Google Cloud 
 
 ## Documentation
 - [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally.
+
+## Contact
+- Email: idowidya.yudhatama@gmail.com
+- LinkedIn: https://linkedin.com/in/idoyudha
