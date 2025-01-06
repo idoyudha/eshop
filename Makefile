@@ -40,6 +40,7 @@ build-prod: ### build all services for production
 
 kompose: ### convert docker-compose.prod.yml to kubernetes yaml and update the images
 	@kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+	@bash scripts/cleanup_configmaps.sh
 	@bash scripts/update_k8s_manifests.sh eshop-444706
 	@bash scripts/update_deployments.sh
 .PHONY: kompose
