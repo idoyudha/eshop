@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  AUTH_BASE_URL: http://eshop-auth:2003
+  AWS_ACCESS_KEY: AKIAU7FBPIAHITTHGZA7
+  AWS_REGION: ap-southeast-1
+  AWS_SECRET_KEY: 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
+  CLOUDFRONT_DOMAIN: https://dpn2fs8em7hu0.cloudfront.net
+  KAFKA_BOOTSTRAP_SERVERS: kafka1:29092
+  MYSQL_DATABASE: payments
+  MYSQL_HOST: mysql-payment
+  MYSQL_PASSWORD: password
+  MYSQL_PORT: "3306"
+  MYSQL_USER: admin
+  S3_BUCKET_NAME: ido-eshop-payments
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: eshop-payment-eshop-payment-env
+  name: eshop-payment-env

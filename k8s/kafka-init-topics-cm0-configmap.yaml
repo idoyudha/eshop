@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  message.json: |-
+    {
+        "product_id": "0193cfca-2d03-7c44-8ff1-823048fe15b0",
+        "product_name": "kafka test",
+        "product_price": 100,
+        "product_quantity": 1,
+        "description": "kafka testing init"
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: kafka-init-topics
+  name: kafka-init-topics-cm0

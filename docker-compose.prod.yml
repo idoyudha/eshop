@@ -32,19 +32,6 @@ services:
       - redis-data:/var/lib/redis
   
   #######################################
-  # RedisInsight: Redis GUI
-  #######################################
-  redisinsight:
-    image: redislabs/redisinsight:1.13.1
-    container_name: redisinsight
-    depends_on:
-      - redis
-    networks:
-      - eshop-net
-    ports:
-      - "8001:8001"
-
-  #######################################
   # MySQL: Cart Database
   #######################################
   mysql-cart:
@@ -66,7 +53,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       timeout: 20s
       retries: 10
-
+  
   #######################################
   # PostgreSQL: Order Write Database
   #######################################
@@ -166,9 +153,10 @@ services:
   eshop-product:
     build:
       context: ./src/eshop-product
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-product
+    restart: always
     env_file:
       - ./src/eshop-product/.env
     ports:
@@ -189,9 +177,10 @@ services:
   eshop-cart:
     build:
       context: ./src/eshop-cart
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-cart
+    restart: always
     env_file:
       - ./src/eshop-cart/.env
     ports:
@@ -214,9 +203,10 @@ services:
   eshop-auth:
     build:
       context: ./src/eshop-auth
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-auth
+    restart: always
     env_file:
       - ./src/eshop-auth/.env
     ports:
@@ -225,16 +215,17 @@ services:
       - ./src/eshop-auth:/app
     networks:
       - eshop-net
-  
+
   ####################################### 
   # Order service
   #######################################
   eshop-order:
     build:
       context: ./src/eshop-order
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-order
+    restart: always
     env_file:
       - ./src/eshop-order/.env
     ports:
@@ -257,9 +248,10 @@ services:
   eshop-warehouse:
     build:
       context: ./src/eshop-warehouse
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-warehouse
+    restart: always
     env_file:
       - ./src/eshop-warehouse/.env
     ports:
@@ -282,14 +274,14 @@ services:
   eshop-payment:
     build:
       context: ./src/eshop-payment
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
     container_name: eshop-payment
+    restart: always
     env_file:
       - ./src/eshop-payment/.env
     ports:
       - "2006:2006" # http port
-      - "5005:5005" # debug port
     volumes:
       - ./src/eshop-payment:/app
     depends_on:
@@ -306,21 +298,18 @@ services:
   eshop-fe-customer:
     build:
       context: ./src/eshop-fe-customer
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
+      args:
+        NEXT_BUILD_STANDALONE: "true"
+        NEXT_TELEMETRY_DISABLED: "1"
+        NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-customer
+    restart: always
     env_file:
-      - ./src/eshop-fe-customer/.env
+      - ./src/eshop-fe-customer/.env.local
     ports:
       - "3000:3000"
-    volumes:
-      - ./src/eshop-fe-customer:/app
-      - /app/node_modules
-      - /app/.next
-    environment:
-      - NODE_ENV=development
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
     depends_on:
       eshop-product: 
         condition: service_started
@@ -339,21 +328,18 @@ services:
   eshop-fe-admin:
     build:
       context: ./src/eshop-fe-admin
-      dockerfile: Dockerfile.dev
-      target: dev
+      dockerfile: Dockerfile
+      target: production
+      args:
+        NEXT_BUILD_STANDALONE: "true"
+        NEXT_TELEMETRY_DISABLED: "1"
+        NEXT_SKIP_PREFETCH: "1"
     container_name: eshop-fe-admin
+    restart: always
     env_file:
-      - ./src/eshop-fe-admin/.env
+      - ./src/eshop-fe-admin/.env.local
     ports:
       - "3001:3001"
-    volumes:
-      - ./src/eshop-fe-admin:/app
-      - /app/node_modules
-      - /app/.next
-    environment:
-      - NODE_ENV=development
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
     depends_on:
       eshop-product: 
         condition: service_started
@@ -376,6 +362,7 @@ services:
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:v0.7.2
+    restart: always
     ports:
       - 8080:8080
     depends_on:
@@ -392,7 +379,6 @@ services:
       KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
       KAFKA_CLUSTERS_1_METRICS_PORT: 9998
       KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
-      DYNAMIC_CONFIG_ENABLED: 'true'
     networks:
       - eshop-net
 
@@ -403,6 +389,7 @@ services:
     image: confluentinc/cp-kafka:7.2.1
     hostname: kafka0
     container_name: kafka0
+    restart: always
     ports:
       - "9092:9092"
       - "9997:9997"
@@ -442,6 +429,7 @@ services:
     image: confluentinc/cp-kafka:7.2.1
     hostname: kafka1
     container_name: kafka1
+    restart: always
     ports:
       - "9093:9092"
       - "9998:9998"
