@@ -43,6 +43,10 @@ kompose: ### convert docker-compose.prod.yml to kubernetes yaml and update the i
 	@bash scripts/update_k8s_manifests.sh eshop-444706
 .PHONY: kompose
 
+create-secrets: ### create kubernetes secrets from env files
+	@bash scripts/create_secrets.sh
+.PHONY: create-secrets
+
 tag: ### tag docker images with GCR prefix
 	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: tag
@@ -51,10 +55,10 @@ push: ### push docker images to GCR
 	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: push
 
-tag-push: ### tag and push docker images to GCR
-	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
-	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
-.PHONY: tag-push
+# tag-push: ### tag and push docker images to GCR
+# 	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
+# 	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
+# .PHONY: tag-push
 
 deploy: ### deploy all services to kubernetes
 	@bash scripts/deploy.sh

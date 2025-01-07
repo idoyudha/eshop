@@ -27,3 +27,5 @@ pkg/
 release/wi-kubernetes-manifests.yaml
 vendor/
 src/
+k8s/*-secret.yaml
+k8s/*-configmap.yaml

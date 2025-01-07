@@ -26,14 +26,7 @@ for service in "${services[@]}"; do
     file="k8s/${service}-deployment.yaml"
     if [ -f "$file" ]; then
         echo "Updating $file..."
-        # Use sed to update the image reference with double eshop- prefix
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS requires an empty string after -i
-            sed -i '' "s|image: .*|image: gcr.io/${PROJECT_ID}/eshop-${service}:latest|" "$file"
-        else
-            # Linux version
-            sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/eshop-${service}:latest|" "$file"
-        fi
+        sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/${service}:latest|" "$file"
     else
         echo "Warning: $file not found"
     fi
