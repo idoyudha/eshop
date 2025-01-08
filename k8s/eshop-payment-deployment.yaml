@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+    kompose.version: 1.34.0 (cbf2835db)
+  labels:
+    io.kompose.service: eshop-payment
+  name: eshop-payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: eshop-payment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+        kompose.version: 1.34.0 (cbf2835db)
+      labels:
+        io.kompose.service: eshop-payment
+    spec:
+      containers:
+        - env:
+            - name: AUTH_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: AUTH_BASE_URL
+                  name: eshop-payment-env
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: AWS_ACCESS_KEY
+                  name: eshop-payment-env
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  key: AWS_REGION
+                  name: eshop-payment-env
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: AWS_SECRET_KEY
+                  name: eshop-payment-env
+            - name: CLOUDFRONT_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  key: CLOUDFRONT_DOMAIN
+                  name: eshop-payment-env
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  key: KAFKA_BOOTSTRAP_SERVERS
+                  name: eshop-payment-env
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  key: MYSQL_DATABASE
+                  name: eshop-payment-env
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MYSQL_HOST
+                  name: eshop-payment-env
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: MYSQL_PASSWORD
+                  name: eshop-payment-env
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: MYSQL_PORT
+                  name: eshop-payment-env
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: MYSQL_USER
+                  name: eshop-payment-env
+            - name: S3_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_BUCKET_NAME
+                  name: eshop-payment-env
+          image: gcr.io/eshop-444706/eshop-payment:latest
+          name: eshop-payment
+          ports:
+            - containerPort: 2006
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app
+              name: eshop-payment-cm0
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: eshop-payment-cm0
+          name: eshop-payment-cm0

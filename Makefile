@@ -83,3 +83,7 @@ auth-gcloud: ### Authorize gcloud
 gcloud-token: ### Get gcloud token
 	gcloud auth print-access-token
 .PHONY: gcloud-token
+
+gcloud-connect-cluster: ### Connect to gcloud cluster
+	gcloud container clusters get-credentials eshop-cluster --zone asia-southeast1 --project eshop-444706
+.PHONY: gcloud-connect-cluster

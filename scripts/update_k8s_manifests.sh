@@ -24,6 +24,7 @@ services=(
 # Update only specific deployment files
 for service in "${services[@]}"; do
     file="k8s/${service}-deployment.yaml"
+    # update image
     if [ -f "$file" ]; then
         echo "Updating $file..."
         sed -i "s|image: .*|image: gcr.io/${PROJECT_ID}/${service}:latest|" "$file"
