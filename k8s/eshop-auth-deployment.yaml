@@ -12,8 +12,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: eshop-auth
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -39,18 +37,11 @@ spec:
           ports:
             - containerPort: 2003
               protocol: TCP
-          volumeMounts:
-            - mountPath: /app
-              name: eshop-auth-cm0
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
             limits:
-              memory: "256Mi"
-              cpu: "200m"
+              cpu: "1"
+              memory: "536870912"
+            requests:
+              cpu: 500m
+              memory: "268435456"
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: eshop-auth-cm0
-          name: eshop-auth-cm0

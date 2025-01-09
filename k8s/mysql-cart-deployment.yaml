@@ -49,16 +49,16 @@ spec:
           ports:
             - containerPort: 3306
               protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "536870912"
+            requests:
+              cpu: 500m
+              memory: "268435456"
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: mysql-cart-data
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
       restartPolicy: Always
       volumes:
         - name: mysql-cart-data

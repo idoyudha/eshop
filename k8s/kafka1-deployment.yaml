@@ -75,18 +75,18 @@ spec:
               protocol: TCP
             - containerPort: 9998
               protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "536870912"
+            requests:
+              cpu: 500m
+              memory: "268435456"
           volumeMounts:
             - mountPath: /tmp/update_run.sh
               name: kafka1-cm0
               readOnly: true
               subPath: update_run.sh
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
       hostname: kafka1
       restartPolicy: Always
       volumes:

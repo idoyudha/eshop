@@ -43,16 +43,16 @@ spec:
           ports:
             - containerPort: 5432
               protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "536870912"
+            requests:
+              cpu: 500m
+              memory: "268435456"
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-warehouse-data
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
       restartPolicy: Always
       volumes:
         - name: postgres-warehouse-data
