@@ -153,16 +153,12 @@ services:
   eshop-product:
     build:
       context: ./src/eshop-product
-      dockerfile: Dockerfile
-      target: production
     container_name: eshop-product
     restart: always
     env_file:
       - ./src/eshop-product/.env
     ports:
       - "2001:2001" # http port
-    volumes:
-      - ./src/eshop-product:/app
     depends_on:
       redis:
         condition: service_started
@@ -177,16 +173,12 @@ services:
   eshop-cart:
     build:
       context: ./src/eshop-cart
-      dockerfile: Dockerfile
-      target: production
     container_name: eshop-cart
     restart: always
     env_file:
       - ./src/eshop-cart/.env
     ports:
       - "2002:2002" # http port
-    volumes:
-      - ./src/eshop-cart:/app
     depends_on:
       redis:
         condition: service_started
@@ -204,15 +196,12 @@ services:
     build:
       context: ./src/eshop-auth
       dockerfile: Dockerfile
-      target: production
     container_name: eshop-auth
     restart: always
     env_file:
       - ./src/eshop-auth/.env
     ports:
       - "2003:2003" # http port
-    volumes:
-      - ./src/eshop-auth:/app
     networks:
       - eshop-net
 
@@ -223,15 +212,12 @@ services:
     build:
       context: ./src/eshop-order
       dockerfile: Dockerfile
-      target: production
     container_name: eshop-order
     restart: always
     env_file:
       - ./src/eshop-order/.env
     ports:
       - "2004:2004" # http port
-    volumes:
-      - ./src/eshop-order:/app
     depends_on:
       postgresql-order-write:
         condition: service_healthy
@@ -249,15 +235,12 @@ services:
     build:
       context: ./src/eshop-warehouse
       dockerfile: Dockerfile
-      target: production
     container_name: eshop-warehouse
     restart: always
     env_file:
       - ./src/eshop-warehouse/.env
     ports:
       - "2005:2005" # http port
-    volumes:
-      - ./src/eshop-warehouse:/app
     depends_on:
       redis:
         condition: service_started
@@ -282,8 +265,6 @@ services:
       - ./src/eshop-payment/.env
     ports:
       - "2006:2006" # http port
-    volumes:
-      - ./src/eshop-payment:/app
     depends_on:
       mysql-payment:
         condition: service_healthy
@@ -299,7 +280,6 @@ services:
     build:
       context: ./src/eshop-fe-customer
       dockerfile: Dockerfile
-      target: production
       args:
         NEXT_BUILD_STANDALONE: "true"
         NEXT_TELEMETRY_DISABLED: "1"
@@ -329,7 +309,6 @@ services:
     build:
       context: ./src/eshop-fe-admin
       dockerfile: Dockerfile
-      target: production
       args:
         NEXT_BUILD_STANDALONE: "true"
         NEXT_TELEMETRY_DISABLED: "1"
