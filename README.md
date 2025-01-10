@@ -1,5 +1,6 @@
 **Eshop** is a cloud microservices application. The application is a web-based e-commerce app where users can find cars or motorcycle, add them to the cart, and purchase them.
 This application combining the service from Amazon Web Service and Google Cloud Platform.
+
 ## Architecture
 ![](./docs/img/eshop-architecture.png)
 | Service                                                            | Language   | Framework   | Database     | Publisher                        | Subscriber                       | Description                                                                                              |
@@ -14,6 +15,19 @@ This application combining the service from Amazon Web Service and Google Cloud 
 | [Sales Report](https://github.com/idoyudha/eshop-sales-report)     | Python     | FastAPI     | PostgresSQL  | -                                | sale-created                     | Reporting service                                                                                        |
 | [Shipping Cost](https://github.com/idoyudha/eshop-shipping-cost)   | Python     | -           | -            | -                                | -                                | API for calculating the cost based on the zipcode differences, running with AWS Lambda                   |
 | [Warehouse](https://github.com/idoyudha/eshop-warehouse)           | Go         | Gin         | PostgresSQL  | product-quantity-updated         | product-created, product_updated | Warehouse service handling movement between warehouse and movement to user, also get real stock of item. |
+
+## Screenshots
+| Home Page                      | Product Detail                           |
+|--------------------------------|------------------------------------------|
+| ![](./docs/img/eshop-home.png) | ![](./docs/img/eshop-product-detail.png) |
+
+| Add to Cart                           | Checkout                           |
+|---------------------------------------|------------------------------------|
+| ![](./docs/img/eshop-add-to-cart.png) | ![](./docs/img/eshop-checkout.png) |
+
+| Order List                           | Order Detail                           |
+|--------------------------------------|----------------------------------------|
+| ![](./docs/img/eshop-order-list.png) | ![](./docs/img/eshop-order-detail.png) |
 
 ## Services
 ### Auth
