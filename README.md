@@ -60,7 +60,7 @@ This application combining the service from Amazon Web Service and Google Cloud 
 - good performance with large datasets
 - built in time-series functionality
 ## Documentation
-- [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally.
+- [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally or via Google Kubernetes Engine.
 - [API Documentation](https://lh53ntuiw1.apidog.io) with password: *0ceNdUuG* (temporary)
 ## Contact
 - Email: idowidya.yudhatama@gmail.com
