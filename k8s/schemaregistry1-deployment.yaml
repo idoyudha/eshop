@@ -20,6 +20,10 @@ spec:
       labels:
         io.kompose.service: schemaregistry1
     spec:
+      initContainers:
+        - name: wait-for-kafka
+          image: busybox
+          command: ['sh', '-c', 'until nc -z kafka1 9092; do echo waiting for kafka; sleep 2; done;']
       containers:
         - env:
             - name: SCHEMA_REGISTRY_HOST_NAME
