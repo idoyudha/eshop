@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+    kompose.version: 1.34.0 (cbf2835db)
+  labels:
+    io.kompose.service: mysql-payment
+  name: mysql-payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-payment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
+        kompose.version: 1.34.0 (cbf2835db)
+      labels:
+        io.kompose.service: mysql-payment
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: payments
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            - name: MYSQL_USER
+              value: admin
+          image: mysql:9
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -u
+                - root
+                - -p$MYSQL_ROOT_PASSWORD
+            failureThreshold: 10
+            timeoutSeconds: 20
+          name: mysql-payment
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "536870912"
+            requests:
+              cpu: 500m
+              memory: "268435456"
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-payment-data
+      restartPolicy: Always
+      volumes:
+        - name: mysql-payment-data
+          persistentVolumeClaim:
+            claimName: mysql-payment-data

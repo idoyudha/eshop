@@ -1,10 +1,8 @@
 **Eshop** is a cloud microservices application. The application is a web-based e-commerce app where users can find cars or motorcycle, add them to the cart, and purchase them.
-
 This application combining the service from Amazon Web Service and Google Cloud Platform.
 
 ## Architecture
-![](./docs/img/architecture.png)
-
+![](./docs/img/eshop-architecture.png)
 | Service                                                            | Language   | Framework   | Database     | Publisher                        | Subscriber                       | Description                                                                                              |
 |--------------------------------------------------------------------|------------|-------------|--------------|----------------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------|
 | [Frontend Customer](https://github.com/idoyudha/eshop-fe-customer) | Typescript | NextJS      | -            | -                                | -                                | Expose an HTTP server to serve the website for user. Does not require signup/login to see all product.   |
@@ -18,47 +16,52 @@ This application combining the service from Amazon Web Service and Google Cloud 
 | [Shipping Cost](https://github.com/idoyudha/eshop-shipping-cost)   | Python     | -           | -            | -                                | -                                | API for calculating the cost based on the zipcode differences, running with AWS Lambda                   |
 | [Warehouse](https://github.com/idoyudha/eshop-warehouse)           | Go         | Gin         | PostgresSQL  | product-quantity-updated         | product-created, product_updated | Warehouse service handling movement between warehouse and movement to user, also get real stock of item. |
 
+## Screenshots
+| Home Page                      | Product Detail                           |
+|--------------------------------|------------------------------------------|
+| ![](./docs/img/eshop-home.png) | ![](./docs/img/eshop-product-detail.png) |
+
+| Add to Cart                           | Checkout                           |
+|---------------------------------------|------------------------------------|
+| ![](./docs/img/eshop-add-to-cart.png) | ![](./docs/img/eshop-checkout.png) |
+
+| Order List                           | Order Detail                           |
+|--------------------------------------|----------------------------------------|
+| ![](./docs/img/eshop-order-list.png) | ![](./docs/img/eshop-order-detail.png) |
 
 ## Services
 ### Auth
 - handled by amazon cognito requested with this service
-
 ### Product
 #### Database: Dynamo DB and Google Cloud Storage for Image
 - High read-to-write ratio (many customers viewing products)
 - Need for fast product view by categories
 - Flexible schema
 - Easy to scale
-
 ### Cart
 #### Database: Redis and MySQL
 - great for active cart, use will read heavy on this (act as primary storage)
 - mysql just for persistence or recovery
 - write is very low in mysql
-
 ### Order
 #### Database: Postgres
 - transaction, require strong consistency
-
 ### Payment
 #### Database: MySQL
 - schema simple and fixed
-
 ### Warehouse
 #### Database: Postgres
 - transaction
 - better handling concurrent update
 - better for complex query with many rows
-
 ### Sales Report
 #### Database: Postgres
 - great for complex analytics query
 - good performance with large datasets
 - built in time-series functionality
-
 ## Documentation
-- [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally.
-
+- [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally or via Google Kubernetes Engine.
+- [API Documentation](https://lh53ntuiw1.apidog.io) with password: *0ceNdUuG* (temporary)
 ## Contact
 - Email: idowidya.yudhatama@gmail.com
 - LinkedIn: https://linkedin.com/in/idoyudha
