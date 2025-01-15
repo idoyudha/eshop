@@ -9,6 +9,7 @@ volumes:
   postgres-warehouse-data:
   postgres-order-write-data:
   postgres-order-read-data:
+  postgres-sales-data:
 
 services:
   #######################################
@@ -192,6 +193,36 @@ services:
       retries: 10
   
   #######################################
+  # PostgreSQL: Sales Database
+  #######################################
+  postgresql-sales:
+    image: postgres:17-alpine
+    container_name: postgresql-sales
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sales
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-sales-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+  
+  #######################################
   # Database ############################
   #######################################
 
@@ -355,6 +386,35 @@ services:
       - "2006:2006" # http port
     depends_on:
       mysql-payment:
+        condition: service_healthy
+      kafka1: 
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    networks:
+      - eshop-net
+
+  #######################################
+  # Sales Report service
+  #######################################
+  eshop-sales-report:
+    build:
+      context: ./src/eshop-sales-report
+      dockerfile: Dockerfile
+    container_name: eshop-sales-report
+    restart: always
+    env_file:
+      - ./src/eshop-sales-report/.env
+    ports:
+      - "2007:2007" # http port
+    depends_on:
+      postgresql-sales:
         condition: service_healthy
       kafka1: 
         condition: service_started
