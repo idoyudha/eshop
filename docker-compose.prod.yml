@@ -652,9 +652,10 @@ services:
               kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
               kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic order-status-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && \
-              kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && \
+              kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created,order-status-updated && \
               kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
     deploy:
       resources:
