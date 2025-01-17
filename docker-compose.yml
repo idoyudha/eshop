@@ -9,6 +9,7 @@ volumes:
   postgres-warehouse-data:
   postgres-order-write-data:
   postgres-order-read-data:
+  postgres-sales-data:
 
 services:
   #######################################
@@ -155,6 +156,28 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       timeout: 20s
       retries: 10
+
+  #######################################
+  # PostgreSQL: Sales Database
+  #######################################
+  postgresql-sales:
+    image: postgres:17-alpine
+    container_name: postgresql-sales
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sales
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-sales-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
   
   #######################################
   # Database ############################
@@ -294,6 +317,30 @@ services:
       - ./src/eshop-payment:/app
     depends_on:
       mysql-payment:
+        condition: service_healthy
+      kafka1: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
+  # Sales Report service
+  #######################################
+  eshop-sales-report:
+    build:
+      context: ./src/eshop-sales-report
+      dockerfile: Dockerfile.dev
+    container_name: eshop-sales-report
+    env_file:
+      - ./src/eshop-sales-report/.env
+    ports:
+      - "2007:2007" # http port
+    volumes:
+      - ./src/eshop-sales-report/app:/app/app
+      - ./src/eshop-sales-report/pyproject.toml:/app/pyproject.toml
+      - ./src/eshop-sales-report/uv.lock:/app/uv.lock
+    depends_on:
+      postgresql-sales:
         condition: service_healthy
       kafka1: 
         condition: service_started
@@ -533,9 +580,10 @@ services:
               kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
               kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic order-status-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && \
-              kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && \
+              kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created,order-status-updated && \
               kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
     networks:
       - eshop-net
