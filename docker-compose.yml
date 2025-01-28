@@ -432,14 +432,10 @@ services:
       - schemaregistry0
       - schemaregistry1
     environment:
-      KAFKA_CLUSTERS_0_NAME: product # NOTE: is it the right name?
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
+      KAFKA_CLUSTERS_0_NAME: cluster-one
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092,kafka1:29092,kafka2:29092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085
-      KAFKA_CLUSTERS_1_NAME: sale
-      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
-      KAFKA_CLUSTERS_1_METRICS_PORT: 9998
-      KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085,http://schemaregistry1:8085
       DYNAMIC_CONFIG_ENABLED: 'true'
     networks:
       - eshop-net
