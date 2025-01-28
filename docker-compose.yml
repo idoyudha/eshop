@@ -3,7 +3,9 @@ networks:
     driver: bridge
 
 volumes:
-  redis-data:
+  redis-master-data:
+  redis-replica1-data:
+  redis-replica2-data:
   mysql-cart-data:
   mysql-payment-data:  
   postgres-warehouse-data:
@@ -17,20 +19,62 @@ services:
   #######################################
 
   #######################################
-  # Redis: In Memory Database (Category and Cart)
+  # Redis HA Sentinel: In Memory Database (Category, Cart, and Order Payment)
   #######################################
-  redis:
+  redis-master:
     image: redis:7-alpine
-    container_name: redis
+    container_name: redis-master
     networks:
       - eshop-net
     ports:
       - "6379:6379"
-    command: redis-server --requirepass password
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+    command: redis-server --requirepass password --masterauth password
     volumes:
-      - redis-data:/var/lib/redis
+      - redis-master-data:/data
+
+  redis-replica1:
+    image: redis:7-alpine
+    container_name: redis-replica1
+    networks:
+      - eshop-net
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass password --masterauth password --replicaof redis-master 6379
+    depends_on:
+      - redis-master
+    volumes:
+      - redis-replica1-data:/data
+
+  redis-replica2:
+    image: redis:7-alpine
+    container_name: redis-replica2
+    networks:
+      - eshop-net
+    ports:
+      - "6381:6379"
+    command: redis-server --requirepass password --masterauth password --replicaof redis-master 6379
+    depends_on:
+      - redis-master
+    volumes:
+      - redis-replica2-data:/data
+
+  sentinel:
+    image: redis:7-alpine
+    container_name: redis-sentinel
+    build:
+      context: ./sentinel
+      dockerfile: Dockerfile
+    environment:
+      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_FAILOVER=5000
+    networks:
+      - eshop-net
+    ports:
+      - "26379:26379"
+    depends_on:
+      - redis-master
+      - redis-replica1
+      - redis-replica2
   
   #######################################
   # RedisInsight: Redis GUI
@@ -39,7 +83,7 @@ services:
     image: redislabs/redisinsight:1.13.1
     container_name: redisinsight
     depends_on:
-      - redis
+      - sentinel
     networks:
       - eshop-net
     ports:
@@ -199,7 +243,9 @@ services:
     volumes:
       - ./src/eshop-product:/app
     depends_on:
-      redis:
+      redis-master:
+        condition: service_started
+      sentinel:
         condition: service_started
       kafka0: 
         condition: service_started
@@ -222,7 +268,9 @@ services:
     volumes:
       - ./src/eshop-cart:/app
     depends_on:
-      redis:
+      redis-master:
+        condition: service_started
+      sentinel:
         condition: service_started
       mysql-cart:
         condition: service_healthy
@@ -265,6 +313,10 @@ services:
     volumes:
       - ./src/eshop-order:/app
     depends_on:
+      redis-master:
+        condition: service_started
+      sentinel:
+        condition: service_started
       postgresql-order-write:
         condition: service_healthy
       postgresql-order-read:
@@ -290,7 +342,9 @@ services:
     volumes:
       - ./src/eshop-warehouse:/app
     depends_on:
-      redis:
+      redis-master:
+        condition: service_started
+      sentinel:
         condition: service_started
       postgresql-warehouse:
         condition: service_healthy
