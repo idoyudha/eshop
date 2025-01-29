@@ -75,6 +75,7 @@ services:
       - eshop-net
     ports:
       - "26379:26379"
+    dns_search: .
     depends_on:
       - redis-master
       - redis-slave1
@@ -96,6 +97,7 @@ services:
       - eshop-net
     ports:
       - "26380:26379"
+    dns_search: .
     depends_on:
       - redis-master
       - redis-slave1
@@ -117,6 +119,7 @@ services:
       - eshop-net
     ports:
       - "26381:26379"
+    dns_search: .
     depends_on:
       - redis-master
       - redis-slave1
