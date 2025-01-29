@@ -26,7 +26,7 @@ services:
       - eshop-net
     ports:
       - "6379:6379"
-    command: redis-server --requirepass password --notify-keyspace-events Ex
+    command: redis-server --requirepass password
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
     volumes:
@@ -201,7 +201,9 @@ services:
     depends_on:
       redis:
         condition: service_started
-      kafka0: 
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
         condition: service_started
     networks:
       - eshop-net
@@ -226,7 +228,9 @@ services:
         condition: service_started
       mysql-cart:
         condition: service_healthy
-      kafka0: 
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
         condition: service_started
     networks:
       - eshop-net
@@ -269,9 +273,9 @@ services:
         condition: service_healthy
       postgresql-order-read:
         condition: service_healthy
-      kafka1: 
-        condition: service_healthy
-      redis:
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
         condition: service_started
     networks:
       - eshop-net
@@ -296,7 +300,9 @@ services:
         condition: service_started
       postgresql-warehouse:
         condition: service_healthy
-      kafka0: 
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
         condition: service_started
     networks:
       - eshop-net
@@ -320,7 +326,9 @@ services:
     depends_on:
       mysql-payment:
         condition: service_healthy
-      kafka1: 
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
         condition: service_started
     networks:
       - eshop-net
@@ -331,7 +339,7 @@ services:
   eshop-sales-report:
     build:
       context: ./src/eshop-sales-report
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: eshop-sales-report
     restart: always
     env_file:
@@ -341,8 +349,12 @@ services:
     depends_on:
       postgresql-sales:
         condition: service_healthy
-      kafka1: 
+      schemaregistry0: 
         condition: service_started
+      schemaregistry1: 
+        condition: service_started
+    networks:
+      - eshop-net
 
   #######################################
   # FE Customer service
@@ -413,7 +425,7 @@ services:
   #######################################
   # Kafka ###############################
   #######################################
-  
+  # Source: https://github.com/confluentinc/cp-all-in-one/blob/7.8.0-post/cp-all-in-one-kraft/docker-compose.yml
   #######################################
   # Kafka UI
   #######################################
@@ -425,17 +437,14 @@ services:
     depends_on:
       - kafka0
       - kafka1
+      - kafka2
       - schemaregistry0
       - schemaregistry1
     environment:
-      KAFKA_CLUSTERS_0_NAME: product
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092
+      KAFKA_CLUSTERS_0_NAME: cluster-one
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka0:29092,kafka1:29092,kafka2:29092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085
-      KAFKA_CLUSTERS_1_NAME: sale
-      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
-      KAFKA_CLUSTERS_1_METRICS_PORT: 9998
-      KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry0:8085,http://schemaregistry1:8085
       DYNAMIC_CONFIG_ENABLED: 'true'
     networks:
       - eshop-net
@@ -444,34 +453,35 @@ services:
   # Kafka Broker 0
   #######################################
   kafka0:
-    image: confluentinc/cp-kafka:7.2.1
+    image: confluentinc/cp-kafka:7.8.0
     hostname: kafka0
     container_name: kafka0
     ports:
       - "9092:9092"
       - "9997:9997"
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_NODE_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka0:29092,PLAINTEXT_HOST://localhost:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_JMX_PORT: 9997
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
+      KAFKA_JMX_HOSTNAME: localhost
       KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_NODE_ID: 1
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29093,3@kafka2:29093'
       KAFKA_LISTENERS: 'PLAINTEXT://kafka0:29092,CONTROLLER://kafka0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-    volumes:
-      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
-    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    # volumes:
+    #   - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+      # - kafka0-data:/tmp/kraft-combined-logs/kafka0
+    # command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server kafka0:29092 --list || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -483,34 +493,75 @@ services:
   # Kafka Broker 1
   #######################################
   kafka1:
-    image: confluentinc/cp-kafka:7.2.1
+    image: confluentinc/cp-kafka:7.8.0
     hostname: kafka1
     container_name: kafka1
     ports:
-      - "9093:9092"
+      - "9093:9093"
       - "9998:9998"
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_NODE_ID: 2
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9093'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_JMX_PORT: 9998
-      KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9998
+      KAFKA_JMX_HOSTNAME: localhost
       KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_NODE_ID: 1
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:29093'
-      KAFKA_LISTENERS: 'PLAINTEXT://kafka1:29092,CONTROLLER://kafka1:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29093,3@kafka2:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka1:29092,CONTROLLER://kafka1:29093,PLAINTEXT_HOST://0.0.0.0:9093'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-    volumes:
-      - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
-    command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    # volumes:
+    #   - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+      # - kafka1-data:/tmp/kraft-combined-logs/kafka1
+    # command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server kafka1:29092 --list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - eshop-net
+
+  #######################################
+  # Kafka Broker 2
+  #######################################
+  kafka2:
+    image: confluentinc/cp-kafka:7.8.0
+    hostname: kafka2
+    container_name: kafka2
+    ports:
+      - "9094:9094"
+      - "9999:9999"
+    environment:
+      KAFKA_NODE_ID: 3
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka2:29092,PLAINTEXT_HOST://localhost:9094'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093,2@kafka1:29093,3@kafka2:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka2:29092,CONTROLLER://kafka2:29093,PLAINTEXT_HOST://0.0.0.0:9094'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    # volumes:
+    #   - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
+      # - kafka2-data:/tmp/kraft-combined-logs/kafka2
+    # command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server kafka2:29092 --list || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -522,20 +573,27 @@ services:
   # Kafka Schema Registry 0
   #######################################
   schemaregistry0:
-    image: confluentinc/cp-schema-registry:7.2.1
+    image: confluentinc/cp-schema-registry:7.8.0
+    container_name: schemaregistry0
     ports:
-      - 8085:8085
+      - "8085:8085"
     depends_on:
-      - kafka0
+      kafka0:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka0:29092
-      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry0
-      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry0:8085
-
-      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
-      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29092,kafka2:29092"
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8085/subjects || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - eshop-net
 
@@ -543,20 +601,27 @@ services:
   # Kafka Schema Registry 1
   #######################################
   schemaregistry1:
-    image: confluentinc/cp-schema-registry:7.2.1
+    image: confluentinc/cp-schema-registry:7.8.0
+    container_name: schemaregistry1
     ports:
-      - 18085:8085
+      - "8086:8085"
     depends_on:
-      - kafka1
+      kafka0:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka1:29092
-      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry1
-      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry1:8085
-
-      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
-      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka0:29092,kafka1:29092,kafka2:29092"
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8085/subjects || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - eshop-net
 
@@ -570,14 +635,18 @@ services:
     depends_on:
       - kafka0
       - kafka1
+      - kafka2
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
+              cub kafka-ready -b kafka0:29092 1 30 && \
               cub kafka-ready -b kafka1:29092 1 30 && \
-              kafka-topics --create --topic product-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && \
-              kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
-              kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && \
+              cub kafka-ready -b kafka2:29092 1 30 && \
+              kafka-topics --create --topic product-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic product-quantity-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && \
+              kafka-topics --create --topic order-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic payment-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic order-status-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && \
+              kafka-topics --create --topic sale-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && \
               kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && \
               kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && \
               kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json'"
