@@ -519,6 +519,8 @@ services:
       - 8085:8085
     depends_on:
       - kafka0
+      - kafka1
+      - kafka2
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry0
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:29092,PLAINTEXT://kafka1:29092,PLAINTEXT://kafka2:29092"
@@ -541,7 +543,7 @@ services:
     image: confluentinc/cp-schema-registry:7.2.1
     container_name: schemaregistry0
     ports:
-      - 18085:8085
+      - 8086:8085
     depends_on:
       - kafka0
       - kafka1
