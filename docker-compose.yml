@@ -10,9 +10,6 @@ volumes:
   postgres-order-write-data:
   postgres-order-read-data:
   postgres-sales-data:
-  # kafka0-data:
-  # kafka1-data:
-  # kafka2-data:
 
 services:
   #######################################
