@@ -108,11 +108,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.333'
           memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
     volumes:
       - redis-sentinel1-data:/data
   
@@ -138,11 +138,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.333'
           memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
     volumes:
       - redis-sentinel2-data:/data
 
@@ -168,11 +168,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.333'
           memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
     volumes:
       - redis-sentinel3-data:/data
   
@@ -191,11 +191,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.167'
           memory: 256M
+        reservations:
+          cpus: '0.083'
+          memory: 128M
     ports:
       - "8001:8001"
   
