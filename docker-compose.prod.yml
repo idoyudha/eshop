@@ -414,7 +414,7 @@ services:
     volumes:
       - ./src/eshop-product:/app
     depends_on:
-      redis:
+      redis-sentinel1:
         condition: service_started
       kafka0: 
         condition: service_started
@@ -446,7 +446,7 @@ services:
     volumes:
       - ./src/eshop-cart:/app
     depends_on:
-      redis:
+      redis-sentinel1:
         condition: service_started
       mysql-cart:
         condition: service_healthy
@@ -541,7 +541,7 @@ services:
     volumes:
       - ./src/eshop-warehouse:/app
     depends_on:
-      redis:
+      redis-sentinel1:
         condition: service_started
       postgresql-warehouse:
         condition: service_healthy
