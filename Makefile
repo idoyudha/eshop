@@ -51,7 +51,7 @@ tag: ### tag docker images with GCR prefix
 	@bash scripts/tag_images.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: tag
 
-push: ### push docker images to GCR
+push: ### push docker images to GCR (already automate using github actions)
 	@bash scripts/push_images.sh $(filter-out $@,$(MAKECMDGOALS))
 .PHONY: push
 
