@@ -682,6 +682,14 @@ services:
       KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka1:29092
       KAFKA_CLUSTERS_1_METRICS_PORT: 9998
       KAFKA_CLUSTERS_1_SCHEMAREGISTRY: http://schemaregistry1:8085
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 512M
     networks:
       - eshop-net
 
@@ -712,6 +720,14 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 512M
     volumes:
       - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
@@ -751,6 +767,14 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 512M
     volumes:
       - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
@@ -760,14 +784,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
     networks:
       - eshop-net
 
@@ -798,6 +814,14 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 512M
     volumes:
       - ./scripts/update_run.sh:/tmp/update_run.sh:ro,Z
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Did you forget the update_run.sh file that came with this docker-compose.yml file?\" && exit 1 ; else bash /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
@@ -834,11 +858,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
+          cpus: '0.583'
+          memory: 1G
         reservations:
-          cpus: '0.5'
-          memory: 256M
+          cpus: '0.333'
+          memory: 512M
     networks:
       - eshop-net
 
@@ -869,11 +893,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 512M
+          cpus: '0.583'
+          memory: 1G
         reservations:
-          cpus: '0.5'
-          memory: 256M
+          cpus: '0.333'
+          memory: 512M
     networks:
       - eshop-net
 
@@ -888,6 +912,14 @@ services:
       - kafka0
       - kafka1
       - kafka2
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 512M
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka1:29092 1 30 && \
               kafka-topics --create --topic product-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && \
