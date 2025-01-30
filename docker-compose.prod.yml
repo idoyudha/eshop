@@ -580,6 +580,37 @@ services:
       - eshop-net
 
   #######################################
+  # Sales Report service
+  #######################################
+  eshop-sales-report:
+    build:
+      context: ./src/eshop-sales-report
+      dockerfile: Dockerfile.dev
+    container_name: eshop-sales-report
+    restart: always
+    env_file:
+      - ./src/eshop-sales-report/.env
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 256M
+        reservations:
+          cpus: '1'
+          memory: 128M
+    ports:
+      - "2007:2007" # http port
+    depends_on:
+      postgresql-sales:
+        condition: service_healthy
+      schemaregistry0: 
+        condition: service_started
+      schemaregistry1: 
+        condition: service_started
+    networks:
+      - eshop-net
+
+  #######################################
   # FE Customer service
   #######################################
   eshop-fe-customer:

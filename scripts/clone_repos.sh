@@ -2,13 +2,13 @@
 
 # Define the list of repositories
 REPOS=(
-    "git@github.com:idoyudha/eshop-product.git"
+    "git@github.com:idoyudha/eshop-auth.git"
     "git@github.com:idoyudha/eshop-cart.git"
     "git@github.com:idoyudha/eshop-order.git"
     "git@github.com:idoyudha/eshop-payment.git"
-    "git@github.com:idoyudha/eshop-warehouse.git"
+    "git@github.com:idoyudha/eshop-product.git"
     "git@github.com:idoyudha/eshop-sales-report.git"
-    "git@github.com:idoyudha/eshop-auth.git"
+    "git@github.com:idoyudha/eshop-warehouse.git"
     "git@github.com:idoyudha/eshop-fe-customer.git"
     "git@github.com:idoyudha/eshop-fe-admin.git"
     "git@github.com:idoyudha/eshop-shipping-cost.git"

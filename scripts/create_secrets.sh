@@ -24,12 +24,13 @@ NAMESPACE="eshop"
 
 # List of services and their corresponding .env files
 declare -A SERVICE_ENV_FILES=(
-    ["eshop-product"]="./src/eshop-product/.env"
-    ["eshop-cart"]="./src/eshop-cart/.env"
     ["eshop-auth"]="./src/eshop-auth/.env"
+    ["eshop-cart"]="./src/eshop-cart/.env"
     ["eshop-order"]="./src/eshop-order/.env"
-    ["eshop-warehouse"]="./src/eshop-warehouse/.env"
     ["eshop-payment"]="./src/eshop-payment/.env"
+    ["eshop-product"]="./src/eshop-product/.env"
+    ["eshop-sales-report"]="./src/eshop-sales-report/.env"
+    ["eshop-warehouse"]="./src/eshop-warehouse/.env"
     ["eshop-fe-customer"]="./src/eshop-fe-customer/.env.local"
     ["eshop-fe-admin"]="./src/eshop-fe-admin/.env.local"
 )

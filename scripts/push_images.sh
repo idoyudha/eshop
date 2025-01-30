@@ -10,12 +10,13 @@ fi
 PROJECT_ID=$1
 
 services=(
-    "eshop-eshop-product"
-    "eshop-eshop-cart"
     "eshop-eshop-auth"
+    "eshop-eshop-cart"
     "eshop-eshop-order"
-    "eshop-eshop-warehouse"
     "eshop-eshop-payment"
+    "eshop-eshop-product"
+    "eshop-eshop-sales-report"
+    "eshop-eshop-warehouse"
     "eshop-eshop-fe-customer"
     "eshop-eshop-fe-admin"
 )

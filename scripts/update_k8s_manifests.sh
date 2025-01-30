@@ -11,14 +11,15 @@ PROJECT_ID=$1
 
 # List of services to update
 services=(
-    "eshop-auth"
-    "eshop-cart"
-    "eshop-fe-admin"
-    "eshop-fe-customer"
-    "eshop-order"
-    "eshop-payment"
-    "eshop-product"
-    "eshop-warehouse"
+    "eshop-eshop-auth"
+    "eshop-eshop-cart"
+    "eshop-eshop-order"
+    "eshop-eshop-payment"
+    "eshop-eshop-product"
+    "eshop-eshop-sales-report"
+    "eshop-eshop-warehouse"
+    "eshop-eshop-fe-customer"
+    "eshop-eshop-fe-admin"
 )
 
 # Update only specific deployment files
