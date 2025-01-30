@@ -3,7 +3,12 @@ networks:
     driver: bridge
 
 volumes:
-  redis-data:
+  redis-master-data:
+  redis-slave1-data:
+  redis-slave2-data:
+  redis-sentinel1-data:
+  redis-sentinel2-data:
+  redis-sentinel3-data:
   mysql-cart-data:
   mysql-payment-data:  
   postgres-warehouse-data:
@@ -15,21 +20,184 @@ services:
   # Database ############################
   #######################################
 
+  # https://cloud.google.com/run/docs/configuring/services/memory-limits
+
   #######################################
-  # Redis: In Memory Database (Category and Cart)
+  # Redis HA Sentinel: In Memory Database (Category, Cart, and Order Payment)
   #######################################
-  redis:
+  redis-master:
     image: redis:7-alpine
-    container_name: redis
+    container_name: redis-master
     networks:
       - eshop-net
     ports:
       - "6379:6379"
-    command: redis-server --requirepass password
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex
+    deploy:
+      resources:
+        limits:
+          cpus: '0.333'
+          memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
     volumes:
-      - redis-data:/var/lib/redis
+      - redis-master-data:/data
+
+  redis-slave1:
+    image: redis:7-alpine
+    container_name: redis-slave1
+    networks:
+      - eshop-net
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --replicaof redis-master 6379
+    depends_on:
+      - redis-master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.333'
+          memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
+    volumes:
+      - redis-slave1-data:/data
+
+  redis-slave2:
+    image: redis:7-alpine
+    container_name: redis-slave2
+    networks:
+      - eshop-net
+    ports:
+      - "6381:6379"
+    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --replicaof redis-master 6379
+    depends_on:
+      - redis-master
+    deploy:
+      resources:
+        limits:
+          cpus: '0.333'
+          memory: 256M
+        reservations:
+          cpus: '0.167'
+          memory: 128M
+    volumes:
+      - redis-slave2-data:/data
+
+  redis-sentinel1:
+    container_name: redis-sentinel1
+    build:
+      context: ./sentinel
+      dockerfile: Dockerfile
+    environment:
+      - SENTINEL_QUORUM=2
+      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_FAILOVER=15000
+      - REDIS_MASTER_PASSWORD=password
+    networks:
+      - eshop-net
+    ports:
+      - "26379:26379"
+    dns_search: .
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    volumes:
+      - redis-sentinel1-data:/data
+  
+  redis-sentinel2:
+    container_name: redis-sentinel2
+    build:
+      context: ./sentinel
+      dockerfile: Dockerfile
+    environment:
+      - SENTINEL_QUORUM=2
+      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_FAILOVER=15000
+      - REDIS_MASTER_PASSWORD=password
+    networks:
+      - eshop-net
+    ports:
+      - "26380:26379"
+    dns_search: .
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    volumes:
+      - redis-sentinel2-data:/data
+
+  redis-sentinel3:
+    container_name: redis-sentinel3
+    build:
+      context: ./sentinel
+      dockerfile: Dockerfile
+    environment:
+      - SENTINEL_QUORUM=2
+      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_FAILOVER=15000
+      - REDIS_MASTER_PASSWORD=password
+    networks:
+      - eshop-net
+    ports:
+      - "26381:26379"
+    dns_search: .
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    volumes:
+      - redis-sentinel3-data:/data
+  
+  #######################################
+  # RedisInsight: Redis GUI
+  #######################################
+  redisinsight:
+    image: redislabs/redisinsight:1.13.1
+    container_name: redisinsight
+    depends_on:
+      - redis-sentinel1
+      - redis-sentinel2
+      - redis-sentinel3
+    networks:
+      - eshop-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    ports:
+      - "8001:8001"
   
   #######################################
   # MySQL: Cart Database
