@@ -25,6 +25,9 @@ services:
 
   #######################################
   # Redis HA Sentinel: In Memory Database (Category, Cart, and Order Payment)
+  # Important Note: Redis replication feature, that allows to stop accepting writes if a master detects that it is no longer able to transfer its writes to the specified number of replicas
+  # min-replicas-to-write 1
+  # min-replicas-max-lag 10
   #######################################
   redis-master:
     image: redis:7-alpine
