@@ -14,6 +14,7 @@ volumes:
   postgres-warehouse-data:
   postgres-order-write-data:
   postgres-order-read-data:
+  postgres-sales-data:
 
 services:
   #######################################
@@ -211,6 +212,14 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: carts
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 500M
     ports:
       - "3306:3306"
     volumes:
@@ -233,6 +242,14 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: orders_write
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.333'
+          memory: 128M
     ports:
       - "5433:5432"
     volumes:
@@ -255,6 +272,14 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: orders_read
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.333'
+          memory: 128M
     ports:
       - "5434:5432"
     volumes:
@@ -277,6 +302,14 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: warehouses
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.333'
+          memory: 128M
     ports:
       - "5432:5432"
     volumes:
@@ -300,6 +333,14 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: payments
+    deploy:
+      resources:
+        limits:
+          cpus: '0.583'
+          memory: 1G
+        reservations:
+          cpus: '0.333'
+          memory: 500M
     ports:
       - "3307:3306"
     volumes:
@@ -308,6 +349,36 @@ services:
       - eshop-net
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 20s
+      retries: 10
+  
+  #######################################
+  # PostgreSQL: Sales Database
+  #######################################
+  postgresql-sales:
+    image: postgres:17-alpine
+    container_name: postgresql-sales
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sales
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.333'
+          memory: 128M
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-sales-data:/var/lib/postgresql/data
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
       timeout: 20s
       retries: 10
   
