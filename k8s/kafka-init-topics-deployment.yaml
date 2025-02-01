@@ -26,16 +26,16 @@ spec:
         - args:
             - bash
             - -c
-            - echo Waiting for Kafka to be ready... && cub kafka-ready -b kafka1:29092 1 30 && kafka-topics --create --topic product-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic product-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic product-quantity-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic order-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && kafka-topics --create --topic payment-updated --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && kafka-topics --create --topic sale-created --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:29092 && kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json
+            - echo Waiting for Kafka to be ready... && cub kafka-ready -b kafka0:29092 1 30 && cub kafka-ready -b kafka1:29092 1 30 && cub kafka-ready -b kafka2:29092 1 30 && kafka-topics --create --topic product-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic product-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic product-quantity-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka0:29092 && kafka-topics --create --topic order-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && kafka-topics --create --topic payment-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && kafka-topics --create --topic order-status-updated --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && kafka-topics --create --topic sale-created --partitions 3 --replication-factor 3 --if-not-exists --bootstrap-server kafka1:29092 && kafka-consumer-groups --bootstrap-server kafka0:29092 --create --group product-group --topic product-created,product-updated,product-quantity-updated && kafka-consumer-groups --bootstrap-server kafka1:29092 --create --group sale-group --topic order-created,payment-updated,sale-created && kafka-console-producer --bootstrap-server kafka0:29092 -topic product-created < /data/message.json
           image: confluentinc/cp-kafka:7.2.1
           name: kafka-init-topics
           resources:
             limits:
-              cpu: 500m
-              memory: "268435456"
+              cpu: 583m
+              memory: "1073741824"
             requests:
-              cpu: 250m
-              memory: "134217728"
+              cpu: 333m
+              memory: "536870912"
           volumeMounts:
             - mountPath: /data/message.json
               name: kafka-init-topics-cm0

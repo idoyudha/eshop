@@ -51,11 +51,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "1"
-              memory: "536870912"
+              cpu: 583m
+              memory: "1073741824"
             requests:
-              cpu: 500m
-              memory: "268435456"
+              cpu: 333m
+              memory: "524288e3"
           volumeMounts:
             - mountPath: /var/lib/mysql
               name: mysql-payment-data

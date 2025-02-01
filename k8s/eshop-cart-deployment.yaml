@@ -57,15 +57,20 @@ spec:
                 configMapKeyRef:
                   key: ORDER_SERVICE
                   name: eshop-cart-env
+            - name: REDIS_MASTER
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_MASTER
+                  name: eshop-cart-env
             - name: REDIS_PASSWORD
               valueFrom:
                 configMapKeyRef:
                   key: REDIS_PASSWORD
                   name: eshop-cart-env
-            - name: REDIS_URL
+            - name: REDIS_SENTINEL_ADDRS
               valueFrom:
                 configMapKeyRef:
-                  key: REDIS_URL
+                  key: REDIS_SENTINEL_ADDRS
                   name: eshop-cart-env
           image: gcr.io/eshop-444706/eshop-cart:latest
           name: eshop-cart
@@ -74,9 +79,9 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "1"
-              memory: "536870912"
-            requests:
-              cpu: 500m
+              cpu: 333m
               memory: "268435456"
+            requests:
+              cpu: 167m
+              memory: "134217728"
       restartPolicy: Always

@@ -26,82 +26,92 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: CART_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_CART_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_CART_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_COGNITO_CLIENT_ID
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_COGNITO_CLIENT_ID
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_COGNITO_DOMAIN
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_COGNITO_DOMAIN
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_IN
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_IN
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_OUT
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_COGNITO_REDIRECT_SIGN_OUT
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_COGNITO_USER_POOL_ID
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_COGNITO_USER_POOL_ID
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_IMAGE_CLOUDFRONT
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_IMAGE_CLOUDFRONT
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_ORDER_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_ORDER_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_PAYMENT_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_PAYMENT_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_PRODUCT_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_PRODUCT_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
+            - name: NEXT_PUBLIC_SALES_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: NEXT_PUBLIC_SALES_SERVICE
+                  name: eshop-fe-admin-env-local
             - name: NEXT_PUBLIC_WAREHOUSE_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: NEXT_PUBLIC_WAREHOUSE_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: ORDER_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: ORDER_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: PAYMENT_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: PAYMENT_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
             - name: PRODUCT_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: PRODUCT_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
+            - name: SALES_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  key: SALES_SERVICE
+                  name: eshop-fe-admin-env-local
             - name: WAREHOUSE_SERVICE
               valueFrom:
                 configMapKeyRef:
                   key: WAREHOUSE_SERVICE
-                  name: eshop-fe-admin-env
+                  name: eshop-fe-admin-env-local
           image: gcr.io/eshop-444706/eshop-fe-admin:latest
           name: eshop-fe-admin
           ports:
@@ -110,8 +120,8 @@ spec:
           resources:
             limits:
               cpu: "1"
-              memory: "536870912"
+              memory: "2147483648"
             requests:
-              cpu: 500m
-              memory: "268435456"
+              cpu: 583m
+              memory: "1073741824"
       restartPolicy: Always

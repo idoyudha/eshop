@@ -5,13 +5,13 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
     kompose.version: 1.34.0 (cbf2835db)
   labels:
-    io.kompose.service: postgresql-warehouse
-  name: postgresql-warehouse
+    io.kompose.service: postgresql-sales
+  name: postgresql-sales
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: postgresql-warehouse
+      io.kompose.service: postgresql-sales
   strategy:
     type: Recreate
   template:
@@ -20,12 +20,12 @@ spec:
         kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
         kompose.version: 1.34.0 (cbf2835db)
       labels:
-        io.kompose.service: postgresql-warehouse
+        io.kompose.service: postgresql-sales
     spec:
       containers:
         - env:
             - name: POSTGRES_DB
-              value: warehouses
+              value: sales
             - name: POSTGRES_PASSWORD
               value: password
             - name: POSTGRES_USER
@@ -39,7 +39,7 @@ spec:
                 - admin
             failureThreshold: 10
             timeoutSeconds: 20
-          name: postgresql-warehouse
+          name: postgresql-sales
           ports:
             - containerPort: 5432
               protocol: TCP
@@ -52,9 +52,9 @@ spec:
               memory: "134217728"
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: postgres-warehouse-data
+              name: postgres-sales-data
       restartPolicy: Always
       volumes:
-        - name: postgres-warehouse-data
+        - name: postgres-sales-data
           persistentVolumeClaim:
-            claimName: postgres-warehouse-data
+            claimName: postgres-sales-data

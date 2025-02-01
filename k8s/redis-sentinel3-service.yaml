@@ -5,12 +5,12 @@ metadata:
     kompose.cmd: kompose convert -f docker-compose.prod.yml --controller deployment --out k8s
     kompose.version: 1.34.0 (cbf2835db)
   labels:
-    io.kompose.service: schemaregistry1
-  name: schemaregistry1
+    io.kompose.service: redis-sentinel3
+  name: redis-sentinel3
 spec:
   ports:
-    - name: "8086"
-      port: 8086
-      targetPort: 8085
+    - name: "26381"
+      port: 26381
+      targetPort: 26379
   selector:
-    io.kompose.service: schemaregistry1
+    io.kompose.service: redis-sentinel3

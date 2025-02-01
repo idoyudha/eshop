@@ -11,7 +11,7 @@ spec:
   ports:
     - name: "9093"
       port: 9093
-      targetPort: 9092
+      targetPort: 9093
     - name: "9998"
       port: 9998
       targetPort: 9998

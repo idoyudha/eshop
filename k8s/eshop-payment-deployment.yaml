@@ -90,8 +90,8 @@ spec:
           resources:
             limits:
               cpu: "1"
-              memory: "536870912"
+              memory: "2147483648"
             requests:
-              cpu: 500m
-              memory: "268435456"
+              cpu: 583m
+              memory: "1073741824"
       restartPolicy: Always

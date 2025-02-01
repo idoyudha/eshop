@@ -32,6 +32,11 @@ spec:
                 configMapKeyRef:
                   key: KAFKA_BROKER
                   name: eshop-order-env
+            - name: ORDER_TIME_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  key: ORDER_TIME_HOURS
+                  name: eshop-order-env
             - name: POSTGRESQL_COMMAND_CONN_ATTEMPS
               valueFrom:
                 configMapKeyRef:
@@ -77,6 +82,21 @@ spec:
                 configMapKeyRef:
                   key: PRODUCT_SERVICE
                   name: eshop-order-env
+            - name: REDIS_MASTER
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_MASTER
+                  name: eshop-order-env
+            - name: REDIS_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PASSWORD
+                  name: eshop-order-env
+            - name: REDIS_SENTINEL_ADDRS
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_SENTINEL_ADDRS
+                  name: eshop-order-env
             - name: SHIPPING_COST_SERVICE
               valueFrom:
                 configMapKeyRef:
@@ -94,9 +114,9 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: "1"
-              memory: "536870912"
-            requests:
-              cpu: 500m
+              cpu: 333m
               memory: "268435456"
+            requests:
+              cpu: 167m
+              memory: "134217728"
       restartPolicy: Always

@@ -22,22 +22,16 @@ spec:
     spec:
       containers:
         - env:
+            - name: DYNAMIC_CONFIG_ENABLED
+              value: "true"
             - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-              value: kafka0:29092
+              value: kafka0:29092,kafka1:29092,kafka2:29092
             - name: KAFKA_CLUSTERS_0_METRICS_PORT
               value: "9997"
             - name: KAFKA_CLUSTERS_0_NAME
-              value: product
+              value: cluster-one
             - name: KAFKA_CLUSTERS_0_SCHEMAREGISTRY
-              value: http://schemaregistry0:8085
-            - name: KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS
-              value: kafka1:29092
-            - name: KAFKA_CLUSTERS_1_METRICS_PORT
-              value: "9998"
-            - name: KAFKA_CLUSTERS_1_NAME
-              value: sale
-            - name: KAFKA_CLUSTERS_1_SCHEMAREGISTRY
-              value: http://schemaregistry1:8085
+              value: http://schemaregistry0:8085,http://schemaregistry1:8085
           image: provectuslabs/kafka-ui:v0.7.2
           name: kafka-ui
           ports:
@@ -45,9 +39,9 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 500m
-              memory: "268435456"
+              cpu: 583m
+              memory: "1073741824"
             requests:
-              cpu: 250m
-              memory: "134217728"
+              cpu: 333m
+              memory: "536870912"
       restartPolicy: Always
