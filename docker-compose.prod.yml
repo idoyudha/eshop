@@ -628,7 +628,7 @@ services:
     container_name: eshop-fe-customer
     restart: always
     env_file:
-      - ./src/eshop-fe-customer/.env.local
+      - ./src/eshop-fe-customer/.env
     deploy:
       resources:
         limits:
@@ -666,7 +666,7 @@ services:
     container_name: eshop-fe-admin
     restart: always
     env_file:
-      - ./src/eshop-fe-admin/.env.local
+      - ./src/eshop-fe-admin/.env
     deploy:
       resources:
         limits:

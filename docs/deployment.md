@@ -5,9 +5,6 @@ kubectl create namespace eshop
 
 ## ConfigMaps
 # Kafka Config
-kubectl apply -f k8s/kafka0-cm0-configmap.yaml -n eshop
-kubectl apply -f k8s/kafka1-cm0-configmap.yaml -n eshop
-kubectl apply -f k8s/kafka2-cm0-configmap.yaml -n eshop
 kubectl apply -f k8s/kafka-init-topics-cm0-configmap.yaml -n eshop
 
 # Backend Services Config
