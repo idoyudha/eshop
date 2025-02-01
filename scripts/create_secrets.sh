@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 # Function to convert .env file to kubectl secret command
 create_secret_from_env() {
