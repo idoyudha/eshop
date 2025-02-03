@@ -37,6 +37,11 @@ services:
     command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex
     volumes:
       - redis-master-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "password", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   redis-slave1:
     image: redis:7-alpine
@@ -299,6 +304,8 @@ services:
     volumes:
       - ./src/eshop-product:/app
     depends_on:
+      redis-master:
+        condition: service_healthy
       redis-sentinel1:
         condition: service_started
       schemaregistry0: 
@@ -324,6 +331,8 @@ services:
     volumes:
       - ./src/eshop-cart:/app
     depends_on:
+      redis-master:
+        condition: service_healthy
       redis-sentinel1:
         condition: service_started
       mysql-cart:
@@ -396,6 +405,8 @@ services:
     volumes:
       - ./src/eshop-warehouse:/app
     depends_on:
+      redis-master:
+        condition: service_healthy
       redis-sentinel1:
         condition: service_started
       postgresql-warehouse:
