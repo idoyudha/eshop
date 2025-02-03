@@ -11,7 +11,9 @@ volumes:
   redis-sentinel3-data:
   mysql-cart-data:
   mysql-payment-data:  
-  postgres-warehouse-data:
+  postgres-warehouse-master-data:
+  postgres-warehouse-slave1-data:
+  postgres-warehouse-slave2-data:
   postgres-order-write-data:
   postgres-order-read-data:
   postgres-sales-data:
@@ -215,24 +217,86 @@ services:
   #######################################
   # PostgreSQL: Warehouse Database
   #######################################
-  postgresql-warehouse:
+  postgresql-master-warehouse:
     image: postgres:17-alpine
-    container_name: postgresql-warehouse
+    container_name: postgresql-master-warehouse
     restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
       POSTGRES_DB: warehouses
+      POSTGRES_REPLICATION_USER: replicator
+      POSTGRES_REPLICATION_PASSWORD: replicator_password
     ports:
-      - "5432:5432"
+      - "5436:5432"
     volumes:
-      - postgres-warehouse-data:/var/lib/postgresql/data
+      - postgres-warehouse-master-data:/var/lib/postgresql/data
+      - ./scripts/init-postgres-master.sh:/docker-entrypoint-initdb.d/init-postgres-master.sh
     networks:
       - eshop-net
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "admin"]
       timeout: 20s
       retries: 10
+    command: >
+      postgres 
+      -c wal_level=replica 
+      -c max_wal_senders=2
+      -c max_replication_slots=2
+  
+  postgresql-slave1-warehouse:
+    image: postgres:17-alpine
+    container_name: postgresql-slave1-warehouse
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: warehouses
+      POSTGRES_MASTER_HOST: postgresql-master-warehouse
+      POSTGRES_MASTER_PORT: 5436
+      POSTGRES_REPLICATION_USER: replicator
+      POSTGRES_REPLICATION_PASSWORD: replicator_password
+      REPLICA_NAME: replica1
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-warehouse-slave1-data:/var/lib/postgresql/data
+      - ./scripts/init-postgres-slave.sh:/docker-entrypoint-initdb.d/init-postgres-slave.sh
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+    depends_on:
+      - postgresql-master-warehouse
+
+  postgresql-slave2-warehouse:
+    image: postgres:17-alpine
+    container_name: postgresql-slave2-warehouse
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: warehouses
+      POSTGRES_MASTER_HOST: postgresql-master-warehouse
+      POSTGRES_MASTER_PORT: 5436
+      POSTGRES_REPLICATION_USER: replicator
+      POSTGRES_REPLICATION_PASSWORD: replicator_password
+      REPLICA_NAME: replica1
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-warehouse-slave2-data:/var/lib/postgresql/data
+      - ./scripts/init-postgres-slave.sh:/docker-entrypoint-initdb.d/init-postgres-slave.sh
+    networks:
+      - eshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin"]
+      timeout: 20s
+      retries: 10
+    depends_on:
+      - postgresql-master-warehouse
 
   #######################################
   # MySQL: Payment Database
