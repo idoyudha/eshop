@@ -28,7 +28,7 @@ services:
   # min-replicas-max-lag 10
   #######################################
   redis-master:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-master
     networks:
       - eshop-net
@@ -44,26 +44,26 @@ services:
       retries: 5
 
   redis-slave1:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-slave1
     networks:
       - eshop-net
     ports:
       - "6380:6379"
-    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --replicaof redis-master 6379
+    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --slaveof redis-master 6379
     depends_on:
       - redis-master
     volumes:
       - redis-slave1-data:/data
 
   redis-slave2:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-slave2
     networks:
       - eshop-net
     ports:
       - "6381:6379"
-    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --replicaof redis-master 6379
+    command: redis-server --requirepass password --masterauth password --notify-keyspace-events Ex --slaveof redis-master 6379
     depends_on:
       - redis-master
     volumes:
