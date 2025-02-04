@@ -5,6 +5,7 @@ This guide is for developers who want to work on the Eshop project.
 - [Kubernetes](https://kubernetes.io/)
 - [Docker for Desktop](https://www.docker.com/)
 - Google Cloud Project with Google Container Registry enabled (for Option 2 - GKE)
+- Shell environment with `gcloud`, `git`, and `kubectl` (for Option 2 - GKE)
 
 ## Option 1 - Local Development (Docker Compose)
 1. Clone the repository to your local machine using `git clone https://github.com/idoyudha/eshop.git`.
