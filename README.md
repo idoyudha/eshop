@@ -31,34 +31,37 @@ This application combining the service from Amazon Web Service and Google Cloud 
 
 ## Services
 ### Auth
-- handled by amazon cognito requested with this service
+- handled by amazon cognito, requested with this service
 ### Product
-#### Database: Dynamo DB and Google Cloud Storage for Image
+#### Database: Dynamo DB and Amazon S3
 - High read-to-write ratio (many customers viewing products)
 - Need for fast product view by categories
 - Flexible schema
 - Easy to scale
+- Durable and reliable for image storage (S3)
 ### Cart
-#### Database: Redis and MySQL
-- great for active cart, use will read heavy on this (act as primary storage)
-- mysql just for persistence or recovery
-- write is very low in mysql
+#### Database: Redis Sentinel and MySQL
+- Great for active cart, use will have read heavy on this (act as primary storage)
+- High availability on redis sentinel, with one master act as write and two slave act as read
+- Mysql just for persistence or recovery
+- Write is very low in mysql
 ### Order
 #### Database: Postgres
-- transaction, require strong consistency
+- Transaction, require strong consistency
 ### Payment
-#### Database: MySQL
-- schema simple and fixed
+#### Database: MySQL and Amazon S3
+- Simple schema and fixed
+- Durable and reliable for image storage (S3)
 ### Warehouse
 #### Database: Postgres
-- transaction
-- better handling concurrent update
-- better for complex query with many rows
+- Transaction
+- Better handling concurrent update
+- Better for complex query with many rows
 ### Sales Report
 #### Database: Postgres
-- great for complex analytics query
-- good performance with large datasets
-- built in time-series functionality
+- Great for complex analytics query
+- Good performance with large datasets
+- Built in time-series functionality
 ## Documentation
 - [Development](/docs/development-guide.md) to learn how to run and develop this microservice locally or via Google Kubernetes Engine.
 - [API Documentation](https://lh53ntuiw1.apidog.io) with password: *0ceNdUuG* (temporary)
