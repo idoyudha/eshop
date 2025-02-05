@@ -30,7 +30,7 @@ services:
   # min-replicas-max-lag 10
   #######################################
   redis-master:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-master
     networks:
       - eshop-net
@@ -49,7 +49,7 @@ services:
       - redis-master-data:/data
 
   redis-slave1:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-slave1
     networks:
       - eshop-net
@@ -70,7 +70,7 @@ services:
       - redis-slave1-data:/data
 
   redis-slave2:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis-slave2
     networks:
       - eshop-net
